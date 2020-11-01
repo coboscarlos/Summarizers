@@ -109,6 +109,23 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <None Include="ToIncludeInDebugDirectoryInterfaceProject\splitta.bat" />
+    <None Include="ToIncludeInDebugDirectoryInterfaceProject\splitta\desktop.ini" />
+    <None Include="ToIncludeInDebugDirectoryInterfaceProject\splitta\model_nb\desktop.ini" />
+    <None Include="ToIncludeInDebugDirectoryInterfaceProject\splitta\model_nb\feats" />
+    <None Include="ToIncludeInDebugDirectoryInterfaceProject\splitta\model_nb\lower_words" />
+    <None Include="ToIncludeInDebugDirectoryInterfaceProject\splitta\model_nb\non_abbrs" />
+    <None Include="ToIncludeInDebugDirectoryInterfaceProject\splitta\model_svm\desktop.ini" />
+    <None Include="ToIncludeInDebugDirectoryInterfaceProject\splitta\model_svm\feats" />
+    <None Include="ToIncludeInDebugDirectoryInterfaceProject\splitta\model_svm\lower_words" />
+    <None Include="ToIncludeInDebugDirectoryInterfaceProject\splitta\model_svm\non_abbrs" />
+    <None Include="ToIncludeInDebugDirectoryInterfaceProject\splitta\model_svm\svm_model" />
+    <None Include="ToIncludeInDebugDirectoryInterfaceProject\splitta\README" />
+    <None Include="ToIncludeInDebugDirectoryInterfaceProject\splitta\sbd_naacl_2009.pdf" />
+    <None Include="ToIncludeInDebugDirectoryInterfaceProject\splitta\sbd_util.pyc" />
+    <None Include="ToIncludeInDebugDirectoryInterfaceProject\splitta\SETUP" />
+    <None Include="ToIncludeInDebugDirectoryInterfaceProject\splitta\splitta - statistical sentence boundary detection - Google Project Hosting.url" />
+    <None Include="ToIncludeInDebugDirectoryInterfaceProject\splitta\word_tokenize.pyc" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
@@ -124,10 +141,18 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ReglasDeNegocio\BusinessRules.csproj">
+    <ProjectReference Include="..\BusinessRules\BusinessRules.csproj">
       <Project>{407b016b-72b4-42d1-8349-8d929bb691fa}</Project>
       <Name>BusinessRules</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="ToIncludeInDebugDirectoryInterfaceProject\HtmlAgilityPack.dll" />
+    <Content Include="ToIncludeInDebugDirectoryInterfaceProject\Lucene.Net.dll" />
+    <Content Include="ToIncludeInDebugDirectoryInterfaceProject\splitta\sample.txt" />
+    <Content Include="ToIncludeInDebugDirectoryInterfaceProject\splitta\sbd.py" />
+    <Content Include="ToIncludeInDebugDirectoryInterfaceProject\splitta\sbd_util.py" />
+    <Content Include="ToIncludeInDebugDirectoryInterfaceProject\splitta\word_tokenize.py" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
