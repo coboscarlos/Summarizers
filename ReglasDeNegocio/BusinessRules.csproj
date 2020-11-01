@@ -1,0 +1,139 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.21022</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{407B016B-72B4-42D1-8349-8D929BB691FA}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>BusinessRules</RootNamespace>
+    <AssemblyName>BusinessRules</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <UpgradeBackupLocation />
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <PlatformTarget>x64</PlatformTarget>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <PlatformTarget>x64</PlatformTarget>
+    <OutputPath>bin\x64\Release\</OutputPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="HtmlAgilityPack, Version=1.4.6.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\Debug\HtmlAgilityPack.dll</HintPath>
+    </Reference>
+    <Reference Include="Lucene.Net, Version=2.9.2.2, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\Debug\Lucene.Net.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml.Linq">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data.DataSetExtensions">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="VectorSpaceModel\SimilarityMatrix.cs" />
+    <Compile Include="VectorSpaceModel\TDM.io.cs" />
+    <Compile Include="VectorSpaceModel\TDMParameters.cs" />
+    <Compile Include="ExtractiveSummarizer\SummarizerAlgorithm.cs" />
+    <Compile Include="ExtractiveSummarizer\Metaheuristics\AlgorithmBase.cs" />
+    <Compile Include="ExtractiveSummarizer\Metaheuristics\GBHS\GBHS.cs" />
+    <Compile Include="ExtractiveSummarizer\Metaheuristics\GBHS\ParametrosGBHS.cs" />
+    <Compile Include="ExtractiveSummarizer\Metaheuristics\GBHS\BaseSolucionGBHS.cs" />
+    <Compile Include="ExtractiveSummarizer\Metaheuristics\FSP\DiscreteFSP.cs" />
+    <Compile Include="ExtractiveSummarizer\Metaheuristics\FSP\FSPDiscreto.cs" />
+    <Compile Include="ExtractiveSummarizer\Metaheuristics\FSP\FSPSolution.cs" />
+    <Compile Include="ExtractiveSummarizer\Metaheuristics\BaseParameters.cs" />
+    <Compile Include="ExtractiveSummarizer\Metaheuristics\BaseSolucion.cs" />
+    <Compile Include="Utils\DUCDataSet.cs" />
+    <Compile Include="Utils\FitnessFunction.cs" />
+    <Compile Include="Utils\PositionValue.cs" />
+    <Compile Include="ExtractiveSummarizer\Graphs\ContinuousLexRank.cs" />
+    <Compile Include="ExtractiveSummarizer\Graphs\DegreeCentralityLexRankParameters.cs" />
+    <Compile Include="ExtractiveSummarizer\Graphs\DegreeCentralityLexRank.cs" />
+    <Compile Include="ExtractiveSummarizer\Graphs\ContinuousLexRankParameters.cs" />
+    <Compile Include="ExtractiveSummarizer\Graphs\LexRankWithThreshold.cs" />
+    <Compile Include="ExtractiveSummarizer\Graphs\LexRankWithThresholdParameters.cs" />
+    <Compile Include="ExtractiveSummarizer\Graphs\UtilLexRank.cs" />
+    <Compile Include="ExtractiveSummarizer\Util.cs" />
+    <Compile Include="Utils\PhraseData.cs" />
+    <Compile Include="Utils\HtmlToText.cs" />
+    <Compile Include="Utils\Matrix.cs" />
+    <Compile Include="Utils\SummaryParameters.cs" />
+    <Compile Include="VectorSpaceModel\LuceneIndexer.cs" />
+    <Compile Include="VectorSpaceModel\TDM.cs" />
+    <Compile Include="VectorSpaceModel\StopWordList.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utils\Calculus.cs" />
+    <Compile Include="Utils\XMLFilePreProcessing.cs" />
+    <Compile Include="Utils\Characters.cs" />
+    <Compile Include="Utils\Rouge.cs" />
+    <Compile Include="Utils\SubTotalsByDataSet.cs">
+      <DependentUpon>SubTotalsByDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Utils\SubTotalsByDataSet.Designer.cs">
+      <DependentUpon>SubTotalsByDataSet.xsd</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="Utils\TestValues.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Utils\SubTotalsByDataSet.xsc">
+      <DependentUpon>SubTotalsByDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Utils\SubTotalsByDataSet.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>SubTotalsByDataSet.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Utils\SubTotalsByDataSet.xss">
+      <DependentUpon>SubTotalsByDataSet.xsd</DependentUpon>
+    </None>
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

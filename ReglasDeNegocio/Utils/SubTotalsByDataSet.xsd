@@ -1,0 +1,35 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="SubTotalsByDataSet" targetNamespace="http://tempuri.org/SubTotalsByDataSet.xsd" xmlns:mstns="http://tempuri.org/SubTotalsByDataSet.xsd" xmlns="http://tempuri.org/SubTotalsByDataSet.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop" attributeFormDefault="qualified" elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:appinfo source="urn:schemas-microsoft-com:xml-msdatasource">
+      <DataSource DefaultConnectionIndex="0" FunctionsComponentName="QueriesTableAdapter" Modifier="AutoLayout, AnsiClass, Class, Public" SchemaSerializationMode="IncludeSchema" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
+        <Connections />
+        <Tables />
+        <Sources />
+      </DataSource>
+    </xs:appinfo>
+  </xs:annotation>
+  <xs:element name="SubTotalsByDataSet" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msprop:EnableTableAdapterManager="true" msprop:Generator_DataSetName="SubTotalsByDataSet" msprop:Generator_UserDSName="SubTotalsByDataSet">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="EvaluatingGroup" msprop:Generator_TableClassName="EvaluatingGroupDataTable" msprop:Generator_TableVarName="tableEvaluatingGroup" msprop:Generator_RowChangedName="EvaluatingGroupRowChanged" msprop:Generator_TablePropName="EvaluatingGroup" msprop:Generator_RowDeletingName="EvaluatingGroupRowDeleting" msprop:Generator_RowChangingName="EvaluatingGroupRowChanging" msprop:Generator_RowEvHandlerName="EvaluatingGroupRowChangeEventHandler" msprop:Generator_RowDeletedName="EvaluatingGroupRowDeleted" msprop:Generator_RowClassName="EvaluatingGroupRow" msprop:Generator_UserTableName="EvaluatingGroup" msprop:Generator_RowEvArgName="EvaluatingGroupRowChangeEvent">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Rouge" msprop:Generator_ColumnVarNameInTable="columnRouge" msprop:Generator_ColumnPropNameInRow="Rouge" msprop:Generator_ColumnPropNameInTable="RougeColumn" msprop:Generator_UserColumnName="Rouge" type="xs:string" />
+              <xs:element name="Name" msprop:Generator_ColumnVarNameInTable="columnName" msprop:Generator_ColumnPropNameInRow="Name" msprop:Generator_ColumnPropNameInTable="NameColumn" msprop:Generator_UserColumnName="Name" type="xs:string" />
+              <xs:element name="Recall" msprop:Generator_ColumnVarNameInTable="columnRecall" msprop:Generator_ColumnPropNameInRow="Recall" msprop:Generator_ColumnPropNameInTable="RecallColumn" msprop:Generator_UserColumnName="Recall" type="xs:decimal" default="0" minOccurs="0" />
+              <xs:element name="Precision" msprop:Generator_ColumnVarNameInTable="columnPrecision" msprop:Generator_ColumnPropNameInRow="Precision" msprop:Generator_ColumnPropNameInTable="PrecisionColumn" msprop:Generator_UserColumnName="Precision" type="xs:decimal" default="0" minOccurs="0" />
+              <xs:element name="Fmeasure" msprop:Generator_ColumnVarNameInTable="columnFmeasure" msprop:Generator_ColumnPropNameInRow="Fmeasure" msprop:Generator_ColumnPropNameInTable="FmeasureColumn" msprop:Generator_UserColumnName="Fmeasure" type="xs:decimal" default="0" minOccurs="0" />
+              <xs:element name="Counter" msprop:Generator_ColumnVarNameInTable="columnCounter" msprop:Generator_ColumnPropNameInRow="Counter" msprop:Generator_ColumnPropNameInTable="CounterColumn" msprop:Generator_UserColumnName="Counter" type="xs:decimal" default="0" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+    <xs:unique name="GrupoEvaluadorKey1" msdata:PrimaryKey="true">
+      <xs:selector xpath=".//mstns:EvaluatingGroup" />
+      <xs:field xpath="mstns:Rouge" />
+      <xs:field xpath="mstns:Name" />
+    </xs:unique>
+  </xs:element>
+</xs:schema>
