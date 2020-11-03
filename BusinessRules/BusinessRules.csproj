@@ -74,11 +74,11 @@
     <Compile Include="ExtractiveSummarizer\SummarizerAlgorithm.cs" />
     <Compile Include="ExtractiveSummarizer\Metaheuristics\AlgorithmBase.cs" />
     <Compile Include="ExtractiveSummarizer\Metaheuristics\GBHS\GBHS.cs" />
-    <Compile Include="ExtractiveSummarizer\Metaheuristics\GBHS\ParametrosGBHS.cs" />
+    <Compile Include="ExtractiveSummarizer\Metaheuristics\GBHS\GBHSParameters.cs" />
     <Compile Include="ExtractiveSummarizer\Metaheuristics\GBHS\BaseSolucionGBHS.cs" />
     <Compile Include="ExtractiveSummarizer\Metaheuristics\FSP\DiscreteFSP.cs" />
-    <Compile Include="ExtractiveSummarizer\Metaheuristics\FSP\FSPDiscreto.cs" />
-    <Compile Include="ExtractiveSummarizer\Metaheuristics\FSP\FSPSolution.cs" />
+    <Compile Include="ExtractiveSummarizer\Metaheuristics\FSP\DiscreteFSPParameters.cs" />
+    <Compile Include="ExtractiveSummarizer\Metaheuristics\FSP\DiscreteFSPSolution.cs" />
     <Compile Include="ExtractiveSummarizer\Metaheuristics\BaseParameters.cs" />
     <Compile Include="ExtractiveSummarizer\Metaheuristics\BaseSolucion.cs" />
     <Compile Include="Utils\DUCDataSet.cs" />

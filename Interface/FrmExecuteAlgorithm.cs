@@ -171,7 +171,36 @@ namespace Interface
                                             MaximoNumeroOptimizacion = 5
                                         };
                                         break;
-                        }
+                            case "FSP":
+                                mySummaryParameters = new GBHSParameters
+                                {
+                                    DetailedReport = false,
+                                    MySummaryType = SummaryType.Words,
+                                    MaximumLengthOfSummaryForRouge = 100,
+                                    MaximumSummaryLengthToEvolve = 110,
+                                    MyTDMParameters = new TDMParameters
+                                    {
+                                        MinimumFrequencyThresholdOfTermsForPhrase = 0, // 0 y 0 son los dos valores originales
+                                        MinimumThresholdForTheAcceptanceOfThePhrase = 0.0,
+                                        TheDocumentRepresentation = _docRep,
+                                        TheTFIDFWeight = _weight
+                                    },
+                                    MaximumNumberOfFitnessFunctionEvaluations = 1600,
+                                    HMS = 10,
+                                    HMCR = 0.95,
+                                    ParMin = 0.01,
+                                    ParMax = 0.99,
+                                    TheFitnessFunction = FitnessFunction.MASDS,
+                                    Alfa = par.Alpha,
+                                    Beta = par.Beta,
+                                    Gamma = par.Gamma,
+                                    Delta = par.Delta,
+                                    Ro = par.Ro,
+                                    ProbabilidadOptimizacion = 0.4,
+                                    MaximoNumeroOptimizacion = 5
+                                };
+                                break;
+                }
 
                         var generator = new GenerarResumenes();
                         generator.Ejecutar(_chosenDUC, mySummaryParameters, _experimentId, _totalRepetitions, _algorithm);
@@ -186,7 +215,7 @@ namespace Interface
             //while (misParametros != null)
             //{
             //    var generador = new GenerarResumenes();
-            //    generador.Ejecutar(_chosenDUC, misParametros, _experimentId, _totalRepetitions, "GBHS");
+            //    generador.Execute(_chosenDUC, misParametros, _experimentId, _totalRepetitions, "GBHS");
             //    progreso += 1;
             //    backgroundWorker1.ReportProgress(progreso/2);
             //    misParametros = misParametrosDePruebaGBHS.GetLast();

@@ -29,7 +29,7 @@ namespace BusinessRules.ExtractiveSummarizer.Metaheuristics
 
         public bool UpdateFitness;
 
-        protected void ObtenerFrasesViablesOrdenadasPorCoberturaCoseno()
+        protected void ObtainViablePhrasesSortedByCosineCoverage()
         {
             ViablePhrases = new List<PositionValue>();
             for (var gen = 0; gen < SolutionSize; gen++)
@@ -40,72 +40,67 @@ namespace BusinessRules.ExtractiveSummarizer.Metaheuristics
             ViablePhrases.Sort((x, y) => -1 * x.Value.CompareTo(y.Value));
         }
 
-        protected List<KeyValuePair<int, double>> SeleccionarFrasesResumenFinal(List<int> frasesActivas)
+        protected List<KeyValuePair<int, double>> SelectPhrasesFromFinalSummary(List<int> activePhrases)
         {
-            var listaFrases = new List<KeyValuePair<int, double>>();
+            var phrasesList = new List<KeyValuePair<int, double>>();
 
             switch (MyParameters.TheFitnessFunction)
             {
                 case FitnessFunction.MCMR:
-                    foreach (var frase in frasesActivas)
-                    {
-                        var nuevo = new KeyValuePair<int, double>(frase, 0);
-                        listaFrases.Add(nuevo);
+                    foreach (var frase in activePhrases){
+                        phrasesList.Add(new KeyValuePair<int, double>(frase, 0));
                     }
                     break;
 
                 case FitnessFunction.CRP:
-                    foreach (var frase in frasesActivas)
-                    {
-                        var nuevo = new KeyValuePair<int, double>(frase, MyTDM.PhrasesList[frase].SimilarityToDocument);
-                        listaFrases.Add(nuevo);
+                    foreach (var frase in activePhrases){
+                        phrasesList.Add(new KeyValuePair<int, double>(frase, MyTDM.PhrasesList[frase].SimilarityToDocument));
                     }
-                    listaFrases.Sort((x, y) => -1 * x.Value.CompareTo(y.Value));
+                    phrasesList.Sort((x, y) => -1 * x.Value.CompareTo(y.Value));
                     break;
 
                 case FitnessFunction.MASDS:
-                    var tamano = frasesActivas.Count;
-                    var longitudPromedio = 0.0;
-                    for (var i = 0; i < tamano; i++)
-                        longitudPromedio += MyTDM.PhrasesList[frasesActivas[i]].Length;
-                    longitudPromedio = longitudPromedio / tamano;
+                    var size = activePhrases.Count;
+                    var avgLength = 0.0;
+                    for (var i = 0; i < size; i++)
+                        avgLength += MyTDM.PhrasesList[activePhrases[i]].Length;
+                    avgLength = avgLength / size;
 
-                    var longitudDesviacion = 0.0;
-                    for (var i = 0; i < tamano; i++)
-                        longitudDesviacion += Math.Pow((MyTDM.PhrasesList[frasesActivas[i]].Length - longitudPromedio), 2);
-                    longitudDesviacion = Math.Sqrt(longitudDesviacion / tamano);
+                    var stdLength = 0.0;
+                    for (var i = 0; i < size; i++)
+                        stdLength += Math.Pow((MyTDM.PhrasesList[activePhrases[i]].Length - avgLength), 2);
+                    stdLength = Math.Sqrt(stdLength / size);
 
-                    foreach (var frase in frasesActivas)
+                    foreach (var thisPhrase in activePhrases)
                     {
-                        var longitud = MyTDM.PhrasesList[frase].Length;
-                        var complemento = Math.Exp((-longitud - longitudPromedio) / longitudDesviacion);
+                        var longitud = MyTDM.PhrasesList[thisPhrase].Length;
+                        var complement = Math.Exp((-longitud - avgLength) / stdLength);
 
                         var cs = 0.0;
-                        foreach (var otrafrase in frasesActivas)
-                            if (otrafrase != frase)
-                                cs += MyExternalMDS.GetCosineSimilarityBetweenPhrases(frase, otrafrase);
+                        foreach (var otrafrase in activePhrases)
+                            if (otrafrase != thisPhrase)
+                                cs += MyExternalMDS.GetCosineSimilarityBetweenPhrases(thisPhrase, otrafrase);
 
                         var cov = 0.0;
-                        foreach (var otrafrase in frasesActivas)
-                            if (otrafrase > frase)
-                                cov += MyTDM.PhrasesList[frase].SimilarityToDocument +
+                        foreach (var otrafrase in activePhrases)
+                            if (otrafrase > thisPhrase)
+                                cov += MyTDM.PhrasesList[thisPhrase].SimilarityToDocument +
                                         MyTDM.PhrasesList[otrafrase].SimilarityToDocument;
 
-                        var f = Math.Sqrt(1.0 / (MyTDM.PhrasesList[frase].PositionInDocument));
-                        f += MyTDM.PhrasesList[frase].SimilarityToTitle;
-                        f += (1 - complemento) / (1 + complemento);
+                        var f = Math.Sqrt(1.0 / (MyTDM.PhrasesList[thisPhrase].PositionInDocument));
+                        f += MyTDM.PhrasesList[thisPhrase].SimilarityToTitle;
+                        f += (1 - complement) / (1 + complement);
                         f += cs + cov;
 
-                        var nuevo = new KeyValuePair<int, double>(frase, f);
-                        listaFrases.Add(nuevo);
+                        phrasesList.Add(new KeyValuePair<int, double>(thisPhrase, f));
                     }
-                    listaFrases.Sort((x, y) => -1 * x.Value.CompareTo(y.Value));
+                    phrasesList.Sort((x, y) => -1 * x.Value.CompareTo(y.Value));
                     break;
             }
-            return listaFrases;
+            return phrasesList;
         }
 
-        public void CalcularRankingPosicionFrases()
+        public void CalculateRankingPhrasePosition()
         {
             var totalFrases = MyTDM.PhrasesList.Count;
             PhrasePositionRanking = new double[totalFrases];
@@ -113,7 +108,7 @@ namespace BusinessRules.ExtractiveSummarizer.Metaheuristics
                 PhrasePositionRanking[i] = (2.0 - (2.0 * (i - 1) / (totalFrases - 1))) / totalFrases;
         }
 
-        public void OrdenarLongitudes()
+        public void SortLengths()
         {
             OrderedLengths = new List<int>();
             foreach (var t in MyTDM.PhrasesList)

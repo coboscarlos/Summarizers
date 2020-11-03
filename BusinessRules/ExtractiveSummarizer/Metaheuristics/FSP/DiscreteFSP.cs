@@ -7,117 +7,91 @@ namespace BusinessRules.ExtractiveSummarizer.Metaheuristics.FSP
 {
     public class DiscreteFSP: AlgorithmBase
     {
-        public FSPSolution Mejor;        
-        public List<FSPSolution> PuntosDeCaptura;
-        public List<FSPSolution> Pi;//Memoria local de la mejor solucion encontrada en cada vecindad de el punto de captura
+        public DiscreteFSPSolution Best;        
+        public List<DiscreteFSPSolution> CapturePoints;
+        public List<DiscreteFSPSolution> Pi; //  Local memory of the best solution found in each neighborhood of the capture point
 
         public override void Summarize(SummaryParameters mySummaryParameters, string newsDirectory, string cacheFileName)
         {
-            MyParameters = (FSPDiscreto)mySummaryParameters;
-
-            //Debug.Write("Iniciando ejecución FSP ");
-            //var inicio = DateTime.Now;
+            MyParameters = (DiscreteFSPParameters)mySummaryParameters;
 
             MyTDM = new TDM(newsDirectory, MyParameters.MyTDMParameters, cacheFileName);
             MyExternalMDS = new SimilarityMatrix(MyTDM, cacheFileName, true);
             SolutionSize = MyTDM.PhrasesList.Count;
 
-            var listaDeFrases = Ejecutar();
+            var phrasesList = Execute();
 
-            TextSummary = Util.SummarizeByCompressionRatio(MyTDM, listaDeFrases, mySummaryParameters.MySummaryType, 
-                MyParameters.MaximumLengthOfSummaryForRouge, out SummaryByPhrases);            
-
-            //var fin = DateTime.Now - inicio;
-            //Debug.Write("FIN - Tiempo FSP " + fin.TotalSeconds);
+            TextSummary = Util.SummarizeByCompressionRatio(MyTDM, phrasesList, mySummaryParameters.MySummaryType, 
+                MyParameters.MaximumLengthOfSummaryForRouge, out SummaryByPhrases);
         }
         
-        public override string ToString()
+        public List<KeyValuePair<int, double>> Execute()
         {
-            return PuntosDeCaptura.Aggregate("", (current, sol) => current + sol);
-        }
-
-        public List<KeyValuePair<int, double>> Ejecutar()
-        {
-            // Definir el valor de C como una Heuristica aceptable 
-            // Al principio debe ser suficientemene grande para explorar el espacio = 2 % rango de busqueda al princio
-            // Al final debe ser suficientemete pequeño para explotar el vecinadrio = 0.000001 al final
-            //var rangoBusqueda = MiFuncion.LimiteSuperiorDimension(0) - MiFuncion.LimiteInferiorDimension(0);
-            //C = 0.02*rangoBusqueda;
-            //var factorDecrecimiento = Math.Pow(0.000001 / C, 1.0/ MaximoNumeroGeneraciones);
             CurrentFFEs = 0;
             MaximumNumberOfFitnessFunctionEvaluations = MyParameters.MaximumNumberOfFitnessFunctionEvaluations;
-            var misParametros = (FSPDiscreto) MyParameters;
+            var myParameters = (DiscreteFSPParameters) MyParameters;
 
-            CalcularRankingPosicionFrases();
-            ObtenerFrasesViablesOrdenadasPorCoberturaCoseno();
-            PuntosDeCaptura = new List<FSPSolution>();
-            Pi = new List<FSPSolution>();
-            Mejor = new FSPSolution(this);            
+            CalculateRankingPhrasePosition();
+            ObtainViablePhrasesSortedByCosineCoverage();
+            CapturePoints = new List<DiscreteFSPSolution>();
+            Pi = new List<DiscreteFSPSolution>();
+            Best = new DiscreteFSPSolution(this);
 
-            // Inicializa la poblacion, le calcula fitness a cada agente y le aplica búsqueda local
-
-            for (var i = 0; i < misParametros.N; i++)
+            // Population initialization, fitness is calculated for each agent and local search is applied
+            for (var i = 0; i < myParameters.N; i++)
             {
-                FSPSolution puntoCapturaNuevo;
+                DiscreteFSPSolution newCapturePoint;
                 do
                 {
-                    puntoCapturaNuevo = new FSPSolution(this);
-                    puntoCapturaNuevo.InicializarAleatorio();                    
-                } while (PuntosDeCaptura.Exists(x => x.Equals(puntoCapturaNuevo)));                
-                PuntosDeCaptura.Add(puntoCapturaNuevo);
-                Pi.Add(puntoCapturaNuevo);
+                    newCapturePoint = new DiscreteFSPSolution(this);
+                    newCapturePoint.InicializarAleatorio();                    
+                } while (CapturePoints.Exists(x => x.Equals(newCapturePoint)));                
+                CapturePoints.Add(newCapturePoint);
+                Pi.Add(newCapturePoint);
             }
-            PuntosDeCaptura.Sort((x, y) => -1 * x.Fitness.CompareTo(y.Fitness));
+            CapturePoints.Sort((x, y) => -1 * x.Fitness.CompareTo(y.Fitness));
             Pi.Sort((x, y) => -1 * x.Fitness.CompareTo(y.Fitness));
-            Mejor = new FSPSolution(PuntosDeCaptura[0]);
-            /*Debug.WriteLine("Soluciones Iniciales");   
-            foreach (var item in PuntosDeCaptura)
-               Debug.WriteLine(item);*/
+            Best = new DiscreteFSPSolution(CapturePoints[0]);
             
-            var c = misParametros.C;
-            for (var generacionActual = 0; generacionActual < misParametros.T; generacionActual++)
+            var c = myParameters.C;
+            for (var actualGeneration = 0; actualGeneration < myParameters.T; actualGeneration++)
             {
-                for (var i = 0; i < misParametros.N; i++)
+                for (var i = 0; i < myParameters.N; i++)
                 {
-                    // Cada pescador en su punto de captura tira la red L veces
-                    var auxL = misParametros.L;
+                    // Each fisherman at his capture throws the net L times
+                    var auxL = myParameters.L;
                     while ((auxL > 0))
                     {
-                        var mejorsolucionLocal = PuntosDeCaptura[i].ThrowFishingNet(c); // Tira la red, actualiza pi y gbest si es el caso
+                        var mejorsolucionLocal = CapturePoints[i].ThrowFishingNet(c); // Throw the network, update PI and Best if it is the case
                         if (mejorsolucionLocal.Fitness > Pi[i].Fitness)
-                            Pi[i] = new FSPSolution(mejorsolucionLocal);
+                            Pi[i] = new DiscreteFSPSolution(mejorsolucionLocal);
                         auxL--;
                         if (CurrentFFEs >= MaximumNumberOfFitnessFunctionEvaluations) break;
                     }
-                    if (Pi[i].Fitness > PuntosDeCaptura[i].Fitness)
-                        PuntosDeCaptura[i] = new FSPSolution(Pi[i]);
+                    if (Pi[i].Fitness > CapturePoints[i].Fitness)
+                        CapturePoints[i] = new DiscreteFSPSolution(Pi[i]);
 
-                    if (PuntosDeCaptura[i].Fitness > Mejor.Fitness)
-                        Mejor = new FSPSolution(PuntosDeCaptura[i]);
+                    if (CapturePoints[i].Fitness > Best.Fitness)
+                        Best = new DiscreteFSPSolution(CapturePoints[i]);
 
                     if (CurrentFFEs >= MaximumNumberOfFitnessFunctionEvaluations) break;
                 }
 
-                PuntosDeCaptura.Sort((x, y) => -1 * x.Fitness.CompareTo(y.Fitness));
+                CapturePoints.Sort((x, y) => -1 * x.Fitness.CompareTo(y.Fitness));
                 Pi.Sort((x, y) => -1 * x.Fitness.CompareTo(y.Fitness));
-                if (PuntosDeCaptura[0].Fitness > Mejor.Fitness)
-                    Mejor = new FSPSolution(PuntosDeCaptura[0]);
-
-                //c = c * factorDecrecimiento;               
-
-                //if (generacionActual % 20 == 0)
-                //    Debug.WriteLine(generacionActual + ": " + Mejor.Fitness + " EFOs = " + EFOs);
+                if (CapturePoints[0].Fitness > Best.Fitness)
+                    Best = new DiscreteFSPSolution(CapturePoints[0]);
 
                 if (CurrentFFEs >= MaximumNumberOfFitnessFunctionEvaluations) break;
             }
 
-            /*Debug.WriteLine("Soluciones Finales");
-            foreach (var item in PuntosDeCaptura)
-                Debug.WriteLine(item);
-            Debug.WriteLine("Best solucion" + Mejor);*/
+            var phrasesList = SelectPhrasesFromFinalSummary(Best.ActivePhrases); 
+            return phrasesList;
+        }
 
-            var listaFrases = SeleccionarFrasesResumenFinal(Mejor.ActivePhrases); 
-            return listaFrases;
+        public override string ToString()
+        {
+            return CapturePoints.Aggregate("", (current, sol) => current + sol);
         }
     }
 }

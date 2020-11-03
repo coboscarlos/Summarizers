@@ -12,14 +12,14 @@ namespace Interface
         private static ParametrosDePruebaFSP _instance;
         private readonly object _thisLock;
 
-        private readonly List<FSPDiscreto> _listaDeParametrosaProbar;
+        private readonly List<DiscreteFSPParameters> _listaDeParametrosaProbar;
         private int _indice;
 
         private ParametrosDePruebaFSP()
         {
             _indice = 0;
             _thisLock = new object();
-            _listaDeParametrosaProbar = new List<FSPDiscreto>();
+            _listaDeParametrosaProbar = new List<DiscreteFSPParameters>();
 
             var dsProbar = new DataSet();  // En este archivo se ponen los parametros que fijo se quieren probar
             dsProbar.ReadXml("SeDebenProbar.xml");
@@ -38,9 +38,9 @@ namespace Interface
             Debug.WriteLine("TOTAL : " + _listaDeParametrosaProbar.Count);
         }
 
-        public FSPDiscreto FijarParametro(double alfa, double beta, double gamma, double delta, double ro)
+        public DiscreteFSPParameters FijarParametro(double alfa, double beta, double gamma, double delta, double ro)
         {
-            var elCasoDeOptimizacion = new FSPDiscreto
+            var elCasoDeOptimizacion = new DiscreteFSPParameters
             {
                 DetailedReport = false,
                 MySummaryType = SummaryType.Words,
@@ -81,7 +81,7 @@ namespace Interface
             }
         }
 
-        public FSPDiscreto GetLast()
+        public DiscreteFSPParameters GetLast()
         {
             int salida;
             lock (_thisLock)

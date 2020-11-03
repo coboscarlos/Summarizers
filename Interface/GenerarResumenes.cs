@@ -105,7 +105,7 @@ namespace Interface
                             sumarizador.Summarize(misParametros, laNoticiaFull, nombreArchivosCache);
                             break;
                         case "DiscreteFSP":
-                            ((FSPDiscreto) misParametros).NumeroAleatorio = new Random(ejecucion);
+                            ((DiscreteFSPParameters) misParametros).NumeroAleatorio = new Random(ejecucion);
                             sumarizador = new DiscreteFSP();
                             sumarizador.Summarize(misParametros, laNoticiaFull, nombreArchivosCache);
                             break;
