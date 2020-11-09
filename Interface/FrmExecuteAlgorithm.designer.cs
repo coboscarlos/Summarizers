@@ -128,8 +128,7 @@
             this.lsbDataSet.FormattingEnabled = true;
             this.lsbDataSet.Items.AddRange(new object[] {
             "DUC2001",
-            "DUC2002",
-            "CnnDm"});
+            "DUC2002"});
             this.lsbDataSet.Location = new System.Drawing.Point(10, 26);
             this.lsbDataSet.Margin = new System.Windows.Forms.Padding(2);
             this.lsbDataSet.Name = "lsbDataSet";

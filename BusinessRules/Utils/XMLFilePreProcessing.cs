@@ -66,6 +66,7 @@ namespace BusinessRules.Utils
         public static string ReadNews(string myDocumentPath)
         {
             var myContent = ValidateXmlTextInFile(myDocumentPath);
+            myContent = myContent.ToLower();
             var start = myContent.IndexOf("<text>");
             var end = myContent.IndexOf("</text>");
             var myText = myContent.Substring(start + 6, end - start - 6);
@@ -83,6 +84,7 @@ namespace BusinessRules.Utils
         public static string GetTitle(string myDocumentPath)
         {
             var myContent = File.ReadAllText(myDocumentPath);
+            myContent = myContent.ToLower();
             var start = myContent.IndexOf("<headline>");
             var end = myContent.IndexOf("</headline>");
             var myTitle = myContent.Substring(start + 10, end - start - 10);

@@ -1,25 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using BusinessRules.ExtractiveSummarizer;
 using BusinessRules.ExtractiveSummarizer.Graphs;
-using BusinessRules.ExtractiveSummarizer.Metaheuristics;
 using BusinessRules.ExtractiveSummarizer.Metaheuristics.DiscreteFSP;
+using BusinessRules.ExtractiveSummarizer.Metaheuristics.DiscreteSFLA;
 using BusinessRules.ExtractiveSummarizer.Metaheuristics.GBHS;
 using BusinessRules.Utils;
 
 namespace Interface
 {
-    class GenerarResumenes
+    class TestSummarizers
     {
         public void Ejecutar(DUCDataSet midataset, SummaryParameters misParametros, int idEjecucion, int totalEjecuciones, string algoritmo)
         {
-            var inicio = DateTime.Now;
-
             //Se establece el Identification de la ejecucion y se crea el directorio de salida
             var directorioDeSalida = midataset.RougeRootDirectory + @"experimentos\" + idEjecucion.ToString("0000");
             Directory.CreateDirectory(directorioDeSalida);
@@ -49,22 +46,6 @@ namespace Interface
                 var x = new FileInfo(laNoticiaFull);
                 var laNoticia = x.Name; //Deja solo el nombre de la noticia
                 Debug.WriteLine(laNoticia + " " + contadorarchivos);
-
-                //var noticia = int.Parse(Path.GetFileName(laNoticiaCompleta));
-                //if (noticia > 6493) continue;
-
-                if (midataset.Name == "CnnDm")
-                {
-                    var ds = new DataSet();
-                    ds.ReadXml(midataset.RougeRootDirectory + @"DS-limites.xml", XmlReadMode.ReadSchema);
-                    var readedrows = ds.Tables[0].Select("News = '" + laNoticia + "'");
-                    var maxSentences = (int) readedrows[0][2];
-                    misParametros.MySummaryType = SummaryType.Sentences;
-                    misParametros.MaximumLengthOfSummaryForRouge = maxSentences;
-                    var maxSentencesEvol = maxSentences;
-                    if (algoritmo == "GBHS" || algoritmo == "FSP")
-                        ((BaseParameters)misParametros).MaximumSummaryLengthToEvolve = maxSentencesEvol;
-                }
 
                 var nombreArchivosCache = midataset.MatricesRootDirectory + laNoticia + "-" +
                                             misParametros.MyTDMParameters.MinimumFrequencyThresholdOfTermsForPhrase + "-" +
@@ -110,6 +91,11 @@ namespace Interface
                             sumarizador = new GBHS();
                             sumarizador.Summarize(misParametros, laNoticiaFull, nombreArchivosCache);
                             break;
+                        case "SFLA":
+                            ((SFLAParameters)misParametros).RandomGenerator = new Random(ejecucion);
+                            sumarizador = new SFLA();
+                            sumarizador.Summarize(misParametros, laNoticiaFull, nombreArchivosCache);
+                            break;
                     }
                     if (sumarizador != null)
                     {
@@ -117,20 +103,10 @@ namespace Interface
                         File.WriteAllText(directorioExperimento + @"\" + laNoticia, contenidoResumenFinal);
                     }
 
-                }; // Fin de for
+                } // Fin de for
                 //}); // Fin de Parallel.For
 
-                Debug.WriteLine("HILO :" + Thread.CurrentThread.ManagedThreadId + " Termino " + laNoticia);
-
-                /*if (contadorarchivos % 10 == 0 || contadorarchivos>= todasLasNoticiasFull.Count)
-                {
-                    var diff = (DateTime.Now - inicio).TotalMinutes;
-                    Debug.WriteLine("HILO :" + Thread.CurrentThread.ManagedThreadId + " " + diff.ToString("#0.00") + " minutos con " +
-                                        (contadorarchivos * 100.0 / todasLasNoticiasFull.Count).ToString("#0.00") + "% Directorios " +
-                                        ((100 * exitosRemplazo) / (exitosRemplazo + fracasosRemplazo)).ToString("#0.00") + "% " +
-                                        ((100 * exitosOptimizacion) / (exitosOptimizacion + fracasosOptimizacion)).ToString("#0.00") + "%");
-                }
-                */
+                Debug.WriteLine("THREAD :" + Thread.CurrentThread.ManagedThreadId + " Termino " + laNoticia);
             }
 
             Debug.WriteLine("EMPIEZA A EVALUAR");

@@ -66,12 +66,10 @@
     <Compile Include="FrmMain.Designer.cs">
       <DependentUpon>FrmMain.cs</DependentUpon>
     </Compile>
-    <Compile Include="GenerarResumenes.cs" />
-    <Compile Include="ParametrosDePruebaFSP.cs" />
-    <Compile Include="ParametrosDePruebaGBHS.cs" />
+    <Compile Include="TestSummarizers.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RougeEnParalelo.cs" />
+    <Compile Include="ParallelRouge.cs" />
     <EmbeddedResource Include="FrmExecuteAlgorithm.resx">
       <DependentUpon>FrmExecuteAlgorithm.cs</DependentUpon>
     </EmbeddedResource>

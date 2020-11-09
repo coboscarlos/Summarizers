@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Configuration;
 using System.Windows.Forms;
 using BusinessRules.ExtractiveSummarizer;
 using BusinessRules.ExtractiveSummarizer.Graphs;
@@ -22,7 +23,7 @@ namespace Interface
         {
             lsbModelos.Text = @"BM25";
             lsAlgorithm.Text = @"LexRankWithThreshold";
-            lsbDataSet.Text = @"CnnDm";
+            lsbDataSet.Text = @"DUC2001";
             lsbDocRep.Text = @"Vector";
             lsbIdExperimento.Text = @"10000";
             lsbTotalEjecuciones.Text = @"1";
@@ -39,22 +40,20 @@ namespace Interface
 
         private void Btn30Duc2005ExcelClick(object sender, EventArgs e)
         {
+            var appSettings = ConfigurationManager.AppSettings;
+            
             var d1 = new DUCDataSet("DUC2001",
-                @"D:\off-line\mineria-de-datos\datos\Evaluacion-ROUGE\DUC2001\evaluacion\",
-                @"D:\off-line\mineria-de-datos\datos\Matrices\DUC2001\");
+                appSettings["DUC2001-dirRouge"],
+                appSettings["DUC2001-dirMatrix"]);
             var d2 = new DUCDataSet("DUC2002",
-                @"D:\off-line\mineria-de-datos\datos\Evaluacion-ROUGE\DUC2002\evaluacion\",
-                @"D:\off-line\mineria-de-datos\datos\Matrices\DUC2002\");
-            var d3 = new DUCDataSet("CnnDm",
-                @"D:\off-line\mineria-de-datos\datos\Evaluacion-ROUGE\CnnDm\evaluacion\",
-                @"D:\off-line\mineria-de-datos\datos\Matrices\CnnDm\");
+                appSettings["DUC2002-dirRouge"],
+                appSettings["DUC2002-dirMatrix"]);
+
             switch (lsbDataSet.SelectedItem.ToString())
             {
                 case "DUC2001": _chosenDUC = d1;
                     break;
                 case "DUC2002": _chosenDUC = d2;
-                    break;
-                case "CnnDm": _chosenDUC = d3;
                     break;
             }
 
@@ -203,7 +202,7 @@ namespace Interface
                     };
                     break;
             }
-            var generator = new GenerarResumenes();
+            var generator = new TestSummarizers();
             generator.Ejecutar(_chosenDUC, mySummaryParameters, _experimentId, _totalRepetitions, _algorithm);
             progress += 1;
             backgroundWorker1.ReportProgress(progress/2);
