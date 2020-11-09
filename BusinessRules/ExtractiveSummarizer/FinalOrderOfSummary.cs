@@ -1,8 +1,8 @@
 ﻿namespace BusinessRules.Utils
 {
-    public enum FitnessFunction
+    public enum FinalOrderOfSummary
     {
-        MCMR,
+        Position,
         CRP,
         MASDS
     }

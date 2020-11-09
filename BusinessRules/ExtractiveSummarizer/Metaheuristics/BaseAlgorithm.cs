@@ -5,7 +5,7 @@ using BusinessRules.Utils;
 
 namespace BusinessRules.ExtractiveSummarizer.Metaheuristics
 {
-    public abstract class AlgorithmBase : SummarizerAlgorithm
+    public abstract class BaseAlgorithm : SummarizerAlgorithm
     {
         public BaseParameters MyParameters;
 
@@ -15,51 +15,36 @@ namespace BusinessRules.ExtractiveSummarizer.Metaheuristics
         public SimilarityMatrix MyExternalMDS;
         public int SolutionSize;
 
-        public List<PositionValue> ViablePhrases;
-        
         public double[] PhrasePositionRanking;
-
         public List<int> OrderedLengths;
 
-        public double MaxCoverage = 0.0;
+        public double RangeCoverage = 0.0;
         public double MinCoverage = 1.0;
 
-        public double MaxCohesion = 0.0;
+        public double RangeCohesion = 0.0;
         public double MinCohesion = 1.0;
 
-        public bool UpdateFitness;
-
-        protected void ObtainViablePhrasesSortedByCosineCoverage()
+        protected List<PositionValue> SelectPhrasesFromFinalSummary(List<int> activePhrases)
         {
-            ViablePhrases = new List<PositionValue>();
-            for (var gen = 0; gen < SolutionSize; gen++)
-            {
-                ViablePhrases.Add(new PositionValue(gen,
-                    MyTDM.PhrasesList[gen].SimilarityToDocument));
-            }
-            ViablePhrases.Sort((x, y) => -1 * x.Value.CompareTo(y.Value));
-        }
+            var phrasesList = new List<PositionValue>();
 
-        protected List<KeyValuePair<int, double>> SelectPhrasesFromFinalSummary(List<int> activePhrases)
-        {
-            var phrasesList = new List<KeyValuePair<int, double>>();
-
-            switch (MyParameters.TheFitnessFunction)
+            switch (MyParameters.TheFinalOrderOfSummary)
             {
-                case FitnessFunction.MCMR:
+                case FinalOrderOfSummary.Position:
                     foreach (var frase in activePhrases){
-                        phrasesList.Add(new KeyValuePair<int, double>(frase, 0));
+                        phrasesList.Add(new PositionValue(frase, MyTDM.PhrasesList[frase].PositionInDocument));
                     }
+                    phrasesList.Sort((x, y) => x.Value.CompareTo(y.Value));
                     break;
 
-                case FitnessFunction.CRP:
+                case FinalOrderOfSummary.CRP:
                     foreach (var frase in activePhrases){
-                        phrasesList.Add(new KeyValuePair<int, double>(frase, MyTDM.PhrasesList[frase].SimilarityToDocument));
+                        phrasesList.Add(new PositionValue(frase, MyTDM.PhrasesList[frase].SimilarityToDocument));
                     }
                     phrasesList.Sort((x, y) => -1 * x.Value.CompareTo(y.Value));
                     break;
 
-                case FitnessFunction.MASDS:
+                case FinalOrderOfSummary.MASDS:
                     var size = activePhrases.Count;
                     var avgLength = 0.0;
                     for (var i = 0; i < size; i++)
@@ -92,7 +77,7 @@ namespace BusinessRules.ExtractiveSummarizer.Metaheuristics
                         f += (1 - complement) / (1 + complement);
                         f += cs + cov;
 
-                        phrasesList.Add(new KeyValuePair<int, double>(thisPhrase, f));
+                        phrasesList.Add(new PositionValue(thisPhrase, f));
                     }
                     phrasesList.Sort((x, y) => -1 * x.Value.CompareTo(y.Value));
                     break;

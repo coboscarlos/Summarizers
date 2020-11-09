@@ -224,7 +224,9 @@
             this.lsAlgorithm.Items.AddRange(new object[] {
             "LexRankWithThreshold",
             "ContinuousLexRank",
-            "GBHS"});
+            "GBHS",
+            "FSP",
+            "SFLA"});
             this.lsAlgorithm.Location = new System.Drawing.Point(458, 26);
             this.lsAlgorithm.Margin = new System.Windows.Forms.Padding(2);
             this.lsAlgorithm.Name = "lsAlgorithm";

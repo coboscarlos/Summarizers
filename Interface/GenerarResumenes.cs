@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using BusinessRules.ExtractiveSummarizer;
 using BusinessRules.ExtractiveSummarizer.Graphs;
 using BusinessRules.ExtractiveSummarizer.Metaheuristics;
-using BusinessRules.ExtractiveSummarizer.Metaheuristics.FSP;
+using BusinessRules.ExtractiveSummarizer.Metaheuristics.DiscreteFSP;
 using BusinessRules.ExtractiveSummarizer.Metaheuristics.GBHS;
 using BusinessRules.Utils;
 
@@ -20,7 +20,7 @@ namespace Interface
         {
             var inicio = DateTime.Now;
 
-            //Se establece el identificador de la ejecucion y se crea el directorio de salida
+            //Se establece el Identification de la ejecucion y se crea el directorio de salida
             var directorioDeSalida = midataset.RougeRootDirectory + @"experimentos\" + idEjecucion.ToString("0000");
             Directory.CreateDirectory(directorioDeSalida);
 
@@ -34,10 +34,6 @@ namespace Interface
             listaDeDirectorios.Sort();
 
             var contadorarchivos = 0;
-            var exitosRemplazo = 0;
-            var fracasosRemplazo = 0;
-            var exitosOptimizacion = 0;
-            var fracasosOptimizacion = 0;
 
             var todasLasNoticiasFull = new List<string>();
             foreach (var elDirectorioFull in listaDeDirectorios) //Recorre cada directorio de documentos y hace ...
@@ -66,7 +62,7 @@ namespace Interface
                     misParametros.MySummaryType = SummaryType.Sentences;
                     misParametros.MaximumLengthOfSummaryForRouge = maxSentences;
                     var maxSentencesEvol = maxSentences;
-                    if (algoritmo == "GBHS" || algoritmo == "DiscreteFSP")
+                    if (algoritmo == "GBHS" || algoritmo == "FSP")
                         ((BaseParameters)misParametros).MaximumSummaryLengthToEvolve = maxSentencesEvol;
                 }
 
@@ -104,13 +100,13 @@ namespace Interface
                             sumarizador = new LexRankWithThreshold();
                             sumarizador.Summarize(misParametros, laNoticiaFull, nombreArchivosCache);
                             break;
-                        case "DiscreteFSP":
-                            ((DiscreteFSPParameters) misParametros).NumeroAleatorio = new Random(ejecucion);
-                            sumarizador = new DiscreteFSP();
+                        case "FSP":
+                            ((FSPParameters) misParametros).RandomGenerator = new Random(ejecucion);
+                            sumarizador = new FSP();
                             sumarizador.Summarize(misParametros, laNoticiaFull, nombreArchivosCache);
                             break;
                         case "GBHS":
-                            ((GBHSParameters) misParametros).NumeroAleatorio = new Random(ejecucion);
+                            ((GBHSParameters) misParametros).RandomGenerator = new Random(ejecucion);
                             sumarizador = new GBHS();
                             sumarizador.Summarize(misParametros, laNoticiaFull, nombreArchivosCache);
                             break;
@@ -119,10 +115,6 @@ namespace Interface
                     {
                         var contenidoResumenFinal = sumarizador.TextSummary;
                         File.WriteAllText(directorioExperimento + @"\" + laNoticia, contenidoResumenFinal);
-                        exitosOptimizacion += sumarizador.SuccessInOptimization;
-                        fracasosOptimizacion += sumarizador.OptimizationFailures;
-                        exitosRemplazo += sumarizador.SuccessInReplacement;
-                        fracasosRemplazo += sumarizador.ReplacementFailures;
                     }
 
                 }; // Fin de for

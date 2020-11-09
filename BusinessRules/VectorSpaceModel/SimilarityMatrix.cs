@@ -15,6 +15,7 @@ namespace BusinessRules.VectorSpaceModel
     {
         public double[][] CosineSimilarityBetweenPhrases;
         private double _maximumSimilarity;
+        public readonly double[] PhraseCohesion;
 
         /// <summary>
         /// </summary>
@@ -24,6 +25,8 @@ namespace BusinessRules.VectorSpaceModel
         /// <returns></returns>
         public SimilarityMatrix(TDM miTDM, string cachefileName, bool normalized = true)
         {
+            PhraseCohesion = new double[miTDM.PhrasesList.Count];
+
             var extension = normalized ? ".msimn" : ".msim";
             cachefileName = cachefileName + extension;
             if (cachefileName.Length != 0)
@@ -79,7 +82,7 @@ namespace BusinessRules.VectorSpaceModel
                     if (i != j)
                         if (CosineSimilarityBetweenPhrases[i][j] > _maximumSimilarity)
                             _maximumSimilarity = CosineSimilarityBetweenPhrases[i][j];
-
+            CalculateCohesionByPhrase();
             SaveToFile(cachefileName); 
         }
 
@@ -104,6 +107,7 @@ namespace BusinessRules.VectorSpaceModel
             }
 
             _maximumSimilarity = double.Parse(lines[posLine]);
+            CalculateCohesionByPhrase();
         }
 
         /// <summary>
@@ -126,5 +130,21 @@ namespace BusinessRules.VectorSpaceModel
         {
             return CosineSimilarityBetweenPhrases[phraseI][phraseJ];
         }
+
+        public void CalculateCohesionByPhrase()
+        {
+            var numFrases = PhraseCohesion.Length;
+            for (var i = 0; i < numFrases; i++)
+            {
+                for (var j = 0; j < numFrases; j++)
+                {
+                    if (i != j)
+                    {
+                        PhraseCohesion[i] += GetCosineSimilarityBetweenPhrases(i, j);
+                    }
+                }
+            }
+        }
+
     }
 }

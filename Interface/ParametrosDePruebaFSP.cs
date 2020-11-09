@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
+using BusinessRules.ExtractiveSummarizer;
+using BusinessRules.ExtractiveSummarizer.Metaheuristics.DiscreteFSP;
 using BusinessRules.VectorSpaceModel;
-using BusinessRules.ExtractiveSummarizer.Metaheuristics.FSP;
 using BusinessRules.Utils;
 
 namespace Interface
@@ -12,14 +13,14 @@ namespace Interface
         private static ParametrosDePruebaFSP _instance;
         private readonly object _thisLock;
 
-        private readonly List<DiscreteFSPParameters> _listaDeParametrosaProbar;
+        private readonly List<FSPParameters> _listaDeParametrosaProbar;
         private int _indice;
 
         private ParametrosDePruebaFSP()
         {
             _indice = 0;
             _thisLock = new object();
-            _listaDeParametrosaProbar = new List<DiscreteFSPParameters>();
+            _listaDeParametrosaProbar = new List<FSPParameters>();
 
             var dsProbar = new DataSet();  // En este archivo se ponen los parametros que fijo se quieren probar
             dsProbar.ReadXml("SeDebenProbar.xml");
@@ -38,9 +39,9 @@ namespace Interface
             Debug.WriteLine("TOTAL : " + _listaDeParametrosaProbar.Count);
         }
 
-        public DiscreteFSPParameters FijarParametro(double alfa, double beta, double gamma, double delta, double ro)
+        public FSPParameters FijarParametro(double alfa, double beta, double gamma, double delta, double ro)
         {
-            var elCasoDeOptimizacion = new DiscreteFSPParameters
+            var elCasoDeOptimizacion = new FSPParameters
             {
                 DetailedReport = false,
                 MySummaryType = SummaryType.Words,
@@ -81,7 +82,7 @@ namespace Interface
             }
         }
 
-        public DiscreteFSPParameters GetLast()
+        public FSPParameters GetLast()
         {
             int salida;
             lock (_thisLock)

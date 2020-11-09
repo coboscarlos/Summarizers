@@ -1,6 +1,6 @@
-﻿namespace BusinessRules.ExtractiveSummarizer.Metaheuristics.FSP
+﻿namespace BusinessRules.ExtractiveSummarizer.Metaheuristics.DiscreteFSP
 {
-    public class DiscreteFSPParameters : BaseParameters
+    public class FSPParameters : BaseParameters
     {
         public int N { get; set; }
         public int L { get; set; }  // number of times the fishing net is thrown at a catch point

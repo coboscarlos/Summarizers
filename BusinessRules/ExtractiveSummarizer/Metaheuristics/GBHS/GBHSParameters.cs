@@ -7,8 +7,8 @@
         public double ParMin = 0.01;
         public double ParMax = 0.99;
 
-        public double ProbabilidadOptimizacion = 0.4;
-        public int MaximoNumeroOptimizacion = 5;
+        public double OptimizacionProbability = 0.4;
+        public int MaxNumberOfOptimizacions = 5;
 
         public override string ToString()
         {
@@ -17,8 +17,8 @@
                             HMCR + "-" +
                             ParMin + "-" +
                             ParMax + "-" +
-                            ProbabilidadOptimizacion + "-" +
-                            MaximoNumeroOptimizacion;
+                            OptimizacionProbability + "-" +
+                            MaxNumberOfOptimizacions;
             return resultado;
         }
     }

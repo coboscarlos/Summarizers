@@ -55,16 +55,16 @@ namespace BusinessRules.ExtractiveSummarizer.Graphs
             // always converges to a single stationary distribution.
             var weights = UtilLexRank.PowerMethod(myCosineSimilarities, Mis.ErrorTolerance);
 
-            var phrasesList = new List<KeyValuePair<int, double>>(); // Save candidate phrases with their weight (relevance)
+            var phrasesList = new List<PositionValue>(); // Save candidate phrases with their weight (relevance)
             for (var i = 0; i < totalPhrases; i++)
-                phrasesList.Add(new KeyValuePair<int, double>(i, weights[i]));
+                phrasesList.Add(new PositionValue(i, weights[i]));
 
             //phrasesList.Sort((x,y) => -1*x.Value.CompareTo(y.Value)); // The phrases are ordered by their weight
 
-            phrasesList.Sort(delegate(KeyValuePair<int, double> x, KeyValuePair<int, double> y)
+            phrasesList.Sort(delegate(PositionValue x, PositionValue y)
             {
                 if (Math.Abs(x.Value - y.Value) < 1e-07)
-                    return myTDM.PhrasesList[x.Key].PositionInDocument.CompareTo(myTDM.PhrasesList[y.Key].PositionInDocument);
+                    return myTDM.PhrasesList[x.Position].PositionInDocument.CompareTo(myTDM.PhrasesList[y.Position].PositionInDocument);
                 return -1 * x.Value.CompareTo(y.Value);
             });
 

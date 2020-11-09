@@ -1,8 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows.Forms;
+using BusinessRules.ExtractiveSummarizer;
 using BusinessRules.ExtractiveSummarizer.Graphs;
+using BusinessRules.ExtractiveSummarizer.Metaheuristics.DiscreteFSP;
+using BusinessRules.ExtractiveSummarizer.Metaheuristics.DiscreteSFLA;
 using BusinessRules.VectorSpaceModel;
 using BusinessRules.ExtractiveSummarizer.Metaheuristics.GBHS;
 using BusinessRules.Utils;
@@ -72,154 +74,139 @@ namespace Interface
             var progress = 0;
             backgroundWorker1.ReportProgress(0);
 
-            var list = new List<TestValues>();
-            //var b00 = new TestValues(0.50, 0.00, 0.30, 0.00, 0.20); lista.Add(b00);
-            //var b01 = new TestValues(0.50, 0.00, 0.32, 0.00, 0.18); lista.Add(b01);
-            //var b02 = new TestValues(0.50, 0.00, 0.28, 0.00, 0.22); lista.Add(b02);
-            //var b03 = new TestValues(0.48, 0.00, 0.30, 0.00, 0.22); lista.Add(b03);
-            //var b04 = new TestValues(0.48, 0.00, 0.32, 0.00, 0.20); lista.Add(b04);
-            //var b05 = new TestValues(0.52, 0.00, 0.30, 0.00, 0.18); lista.Add(b05);
-            var b06 = new TestValues(0.52, 0.00, 0.28, 0.00, 0.20); list.Add(b06);
-            //var b07 = new TestValues(0.40, 0.00, 0.30, 0.00, 0.30); lista.Add(b07);
-            //var b08 = new TestValues(0.30, 0.00, 0.40, 0.00, 0.30); lista.Add(b08);
-            //var b09 = new TestValues(0.30, 0.00, 0.30, 0.00, 0.40); lista.Add(b09);
-            //var b10 = new TestValues(0.20, 0.00, 0.40, 0.00, 0.40); lista.Add(b10);
-            //for (var alfa=0.48; alfa <=0.53; alfa+=0.01)
-            //    for (var gamma = 0.28; gamma <= 0.33; gamma += 0.01)
-            //        for (var ro = 0.18; ro <= 0.23; ro += 0.01)
-            //        {
-            //            if (Math.Abs(alfa + gamma + ro - 1.0) < 0.00001)
-            //            {
-            //                var nuevo = new TestValues(alfa, 0.00, gamma, 0.00, ro);
-            //                lista.Add(nuevo);
-            //            }
-            //        }
-
-            //for (var op = 0.1; op <= 1.0; op += 0.1)
-            //{
-            //    for (var numopt = 5; numopt < 20; numopt += 5)
-            //    {
-                    foreach (var par in list)
+            SummaryParameters mySummaryParameters = null;
+            switch (_algorithm)
+            {
+                case "LexRankWithThreshold":
+                    mySummaryParameters = new LexRankWithThresholdParameters
                     {
-                        SummaryParameters mySummaryParameters = null;
-                        switch (_algorithm)
+                        DetailedReport = false,
+                        MySummaryType = SummaryType.Words,
+                        MaximumLengthOfSummaryForRouge = 100,
+                        MyTDMParameters = new TDMParameters
                         {
-                            case "LexRankWithThreshold":
-                                mySummaryParameters = new LexRankWithThresholdParameters
-                                {
-                                    DetailedReport = false,
-                                    MySummaryType = SummaryType.Words,
-                                    MaximumLengthOfSummaryForRouge = 100,
-                                    MyTDMParameters = new TDMParameters
-                                    {
-                                        MinimumFrequencyThresholdOfTermsForPhrase = 0,
-                                        MinimumThresholdForTheAcceptanceOfThePhrase = 0.0,
-                                        TheDocumentRepresentation = _docRep,
-                                        TheTFIDFWeight = _weight
-                                    },
-                                    Threshold = 0.1,
-                                    DampingFactor = 0.15,
-                                    ErrorTolerance = 0.1,
-                                    SimilarityNormalized = _normalized
-                                };
-                                break;
-                            case "ContinuousLexRank":
-                                        mySummaryParameters = new ContinuousLexRankParameters
-                                        {
-                                            DetailedReport = false,
-                                            MySummaryType = SummaryType.Words,
-                                            MaximumLengthOfSummaryForRouge = 100,
-                                            MyTDMParameters = new TDMParameters
-                                            {
-                                                MinimumFrequencyThresholdOfTermsForPhrase = 0,
-                                                MinimumThresholdForTheAcceptanceOfThePhrase = 0.0,
-                                                TheDocumentRepresentation = _docRep,
-                                                TheTFIDFWeight = _weight
-                                            },
-                                            DampingFactor = 0.15,
-                                            ErrorTolerance = 0.1,
-                                            SimilarityNormalized = _normalized
-                                        };
-                                        break;
+                            MinimumFrequencyThresholdOfTermsForPhrase = 0,
+                            MinimumThresholdForTheAcceptanceOfThePhrase = 0.0,
+                            TheDocumentRepresentation = _docRep,
+                            TheTFIDFWeight = _weight
+                        },
+                        Threshold = 0.1,
+                        DampingFactor = 0.15,
+                        ErrorTolerance = 0.1,
+                        SimilarityNormalized = _normalized
+                    };
+                    break;
+                case "ContinuousLexRank":
+                    mySummaryParameters = new ContinuousLexRankParameters
+                    {
+                        DetailedReport = false,
+                        MySummaryType = SummaryType.Words,
+                        MaximumLengthOfSummaryForRouge = 100,
+                        MyTDMParameters = new TDMParameters
+                        {
+                            MinimumFrequencyThresholdOfTermsForPhrase = 0,
+                            MinimumThresholdForTheAcceptanceOfThePhrase = 0.0,
+                            TheDocumentRepresentation = _docRep,
+                            TheTFIDFWeight = _weight
+                        },
+                        DampingFactor = 0.15,
+                        ErrorTolerance = 0.1,
+                        SimilarityNormalized = _normalized
+                    };
+                    break;
 
-                            case "GBHS":
-                                        mySummaryParameters = new GBHSParameters
-                                        {
-                                            DetailedReport = false,
-                                            MySummaryType = SummaryType.Words,
-                                            MaximumLengthOfSummaryForRouge = 100,
-                                            MaximumSummaryLengthToEvolve = 110,
-                                            MyTDMParameters = new TDMParameters
-                                            {
-                                                MinimumFrequencyThresholdOfTermsForPhrase = 0, // 0 y 0 son los dos valores originales
-                                                MinimumThresholdForTheAcceptanceOfThePhrase = 0.0,
-                                                TheDocumentRepresentation = _docRep,
-                                                TheTFIDFWeight = _weight
-                                            },
-                                            MaximumNumberOfFitnessFunctionEvaluations = 1600,
-                                            HMS = 10,
-                                            HMCR = 0.95,
-                                            ParMin = 0.01,
-                                            ParMax = 0.99,
-                                            TheFitnessFunction = FitnessFunction.MASDS,
-                                            Alfa = par.Alpha,
-                                            Beta = par.Beta,
-                                            Gamma = par.Gamma,
-                                            Delta = par.Delta,
-                                            Ro = par.Ro,
-                                            ProbabilidadOptimizacion = 0.4,
-                                            MaximoNumeroOptimizacion = 5
-                                        };
-                                        break;
-                            case "FSP":
-                                mySummaryParameters = new GBHSParameters
-                                {
-                                    DetailedReport = false,
-                                    MySummaryType = SummaryType.Words,
-                                    MaximumLengthOfSummaryForRouge = 100,
-                                    MaximumSummaryLengthToEvolve = 110,
-                                    MyTDMParameters = new TDMParameters
-                                    {
-                                        MinimumFrequencyThresholdOfTermsForPhrase = 0, // 0 y 0 son los dos valores originales
-                                        MinimumThresholdForTheAcceptanceOfThePhrase = 0.0,
-                                        TheDocumentRepresentation = _docRep,
-                                        TheTFIDFWeight = _weight
-                                    },
-                                    MaximumNumberOfFitnessFunctionEvaluations = 1600,
-                                    HMS = 10,
-                                    HMCR = 0.95,
-                                    ParMin = 0.01,
-                                    ParMax = 0.99,
-                                    TheFitnessFunction = FitnessFunction.MASDS,
-                                    Alfa = par.Alpha,
-                                    Beta = par.Beta,
-                                    Gamma = par.Gamma,
-                                    Delta = par.Delta,
-                                    Ro = par.Ro,
-                                    ProbabilidadOptimizacion = 0.4,
-                                    MaximoNumeroOptimizacion = 5
-                                };
-                                break;
-                }
-
-                        var generator = new GenerarResumenes();
-                        generator.Ejecutar(_chosenDUC, mySummaryParameters, _experimentId, _totalRepetitions, _algorithm);
-                        progress += 1;
-                        backgroundWorker1.ReportProgress(progress/2);
-                    }
-            //    }
-            //}
-
-            //var misParametrosDePruebaGBHS = ParametrosDePruebaGBHS.Instance;
-            //var misParametros = misParametrosDePruebaGBHS.GetLast();
-            //while (misParametros != null)
-            //{
-            //    var generador = new GenerarResumenes();
-            //    generador.Execute(_chosenDUC, misParametros, _experimentId, _totalRepetitions, "GBHS");
-            //    progreso += 1;
-            //    backgroundWorker1.ReportProgress(progreso/2);
-            //    misParametros = misParametrosDePruebaGBHS.GetLast();
-            //}
+                case "GBHS":
+                    mySummaryParameters = new GBHSParameters
+                    {
+                        DetailedReport = false,
+                        MySummaryType = SummaryType.Words,
+                        MaximumLengthOfSummaryForRouge = 100,
+                        MaximumSummaryLengthToEvolve = 110,
+                        MyTDMParameters = new TDMParameters
+                        {
+                            MinimumFrequencyThresholdOfTermsForPhrase = 0, // 0 y 0 son los dos valores originales
+                            MinimumThresholdForTheAcceptanceOfThePhrase = 0.0,
+                            TheDocumentRepresentation = _docRep,
+                            TheTFIDFWeight = _weight
+                        },
+                        MaximumNumberOfFitnessFunctionEvaluations = 1600,
+                        HMS = 10,
+                        HMCR = 0.95,
+                        ParMin = 0.01,
+                        ParMax = 0.99,
+                        TheFitnessFunction = FitnessFunction.MASDS,
+                        OptimizacionProbability = 0.4,
+                        MaxNumberOfOptimizacions = 5,
+                        Alfa = 0.55,
+                        Beta = 0.15,
+                        Gamma = 0.10,
+                        Delta = 0.10,
+                        Ro = 0.10
+                    };
+                    break;
+                case "FSP":
+                    mySummaryParameters = new FSPParameters
+                    {
+                        DetailedReport = false,
+                        MySummaryType = SummaryType.Words,
+                        MaximumLengthOfSummaryForRouge = 100,
+                        MaximumSummaryLengthToEvolve = 110,
+                        MyTDMParameters = new TDMParameters
+                        {
+                            MinimumFrequencyThresholdOfTermsForPhrase = 0, // 0 y 0 son los dos valores originales
+                            MinimumThresholdForTheAcceptanceOfThePhrase = 0.0,
+                            TheDocumentRepresentation = _docRep,
+                            TheTFIDFWeight = _weight
+                        },
+                        MaximumNumberOfFitnessFunctionEvaluations = 1600,
+                        TheFitnessFunction = FitnessFunction.MASDS,
+                        T = 7,
+                        N = 13,
+                        L = 1,
+                        M = 20,
+                        C = 1,
+                        Alfa = 0.55,
+                        Beta = 0.15,
+                        Gamma = 0.10,
+                        Delta = 0.10,
+                        Ro = 0.10
+                    };
+                    break;
+                case "SFLA":
+                    mySummaryParameters = new SFLAParameters
+                    {
+                        DetailedReport = false,
+                        MySummaryType = SummaryType.Words,
+                        MaximumLengthOfSummaryForRouge = 100,
+                        MaximumSummaryLengthToEvolve = 110,
+                        MyTDMParameters = new TDMParameters
+                        {
+                            MinimumFrequencyThresholdOfTermsForPhrase = 0, // 0 y 0 son los dos valores originales
+                            MinimumThresholdForTheAcceptanceOfThePhrase = 0.0,
+                            TheDocumentRepresentation = _docRep,
+                            TheTFIDFWeight = _weight
+                        },
+                        MaximumNumberOfFitnessFunctionEvaluations = 1600,
+                        TheFitnessFunction = FitnessFunction.MASDS,
+                        M = 20,
+                        C = 1,
+                        Tenure =8,
+                        PondSize = 20,
+                        NumberOfMemeplexes = 5,
+                        MaxLocalIterations = 10,
+                        ProbabilityOfMutation = 0.06,
+                        Alfa = 0.55,
+                        Beta = 0.15,
+                        Gamma = 0.10,
+                        Delta = 0.10,
+                        Ro = 0.10,
+                    };
+                    break;
+            }
+            var generator = new GenerarResumenes();
+            generator.Ejecutar(_chosenDUC, mySummaryParameters, _experimentId, _totalRepetitions, _algorithm);
+            progress += 1;
+            backgroundWorker1.ReportProgress(progress/2);
         }
 
         private void BackgroundWorker1_ProgressChanged(object sender, ProgressChangedEventArgs e)

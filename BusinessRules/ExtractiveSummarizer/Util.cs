@@ -8,7 +8,7 @@ namespace BusinessRules.ExtractiveSummarizer
     public class Util
     {
         public static string SummarizeByCompressionRatio(TDM miTDM,
-                                                List<KeyValuePair<int, double>> phrasesList,
+                                                List<PositionValue> phrasesList,
                                                 SummaryType summaryType,
                                                 int summaryLength, out List<KeyValuePair<string, int>> summaryXML)
         {
@@ -21,8 +21,8 @@ namespace BusinessRules.ExtractiveSummarizer
                 string[] words;
                 do
                 {
-                    genSummary += miTDM.PhrasesList[phrasesList[i].Key].OriginalText + " ";
-                    summaryXML.Add(new KeyValuePair<string, int>(miTDM.PhrasesList[phrasesList[i].Key].OriginalText, phrasesList[i].Key));
+                    genSummary += miTDM.PhrasesList[phrasesList[i].Position].OriginalText + " ";
+                    summaryXML.Add(new KeyValuePair<string, int>(miTDM.PhrasesList[phrasesList[i].Position].OriginalText, phrasesList[i].Position));
                     i++;
                     words = genSummary.TrimEnd(' ').Split(' ');
                 } while (words.Length < summaryLength && i < phrasesList.Count);
@@ -44,7 +44,7 @@ namespace BusinessRules.ExtractiveSummarizer
                 for (var f = 0; f < phrasesList.Count; f++)
                 {
                     if (f >= summaryLength) break;
-                    genSummary += miTDM.PhrasesList[phrasesList[f].Key].OriginalText + " ";
+                    genSummary += miTDM.PhrasesList[phrasesList[f].Position].OriginalText + " ";
                 }
                 return (genSummary.Trim());
             }

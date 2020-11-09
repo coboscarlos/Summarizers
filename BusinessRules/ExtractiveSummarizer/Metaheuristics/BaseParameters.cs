@@ -5,10 +5,11 @@ namespace BusinessRules.ExtractiveSummarizer.Metaheuristics
 {
     public abstract class BaseParameters: SummaryParameters
     {
-        public Random NumeroAleatorio;
+        public Random RandomGenerator;
 
         public FitnessFunction TheFitnessFunction = FitnessFunction.MASDS;
-        public double Alfa = 0.75;
+        public FinalOrderOfSummary TheFinalOrderOfSummary = FinalOrderOfSummary.Position;
+        public double Alfa = 0.55;
         public double Beta = 0.15;
         public double Gamma = 0.10;
         public double Delta = 0.10;

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
-using System.Linq;
+using BusinessRules.ExtractiveSummarizer;
 using BusinessRules.VectorSpaceModel;
 using BusinessRules.ExtractiveSummarizer.Metaheuristics.GBHS;
 using BusinessRules.Utils;
@@ -91,8 +91,8 @@ namespace Interface
                 Gamma = gamma, 
                 Delta = delta,
                 Ro = ro,
-                ProbabilidadOptimizacion = 0.4,
-                MaximoNumeroOptimizacion = 5
+                OptimizacionProbability = 0.4,
+                MaxNumberOfOptimizacions = 5
             };
             return elCasoDeOptimizacion;
         }

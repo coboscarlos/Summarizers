@@ -4,9 +4,9 @@ using BusinessRules.Utils;
 
 namespace BusinessRules.ExtractiveSummarizer.Metaheuristics.GBHS
 {
-    public class GBHS: AlgorithmBase
+    public class GBHS: BaseAlgorithm
     {
-        public List<BaseSolucionGBHS> HarmonyMemory;
+        public List<Harmony> HarmonyMemory;
 
         public int OportunidadSA;
 
@@ -15,7 +15,7 @@ namespace BusinessRules.ExtractiveSummarizer.Metaheuristics.GBHS
             MyParameters = (GBHSParameters)mySummaryParameters;
 
             MyTDM = new TDM(newsDirectory, MyParameters.MyTDMParameters, cacheFileName);
-            MyExternalMDS = new SimilarityMatrix(MyTDM, cacheFileName, true);
+            MyExternalMDS = new SimilarityMatrix(MyTDM, cacheFileName);
             SolutionSize = MyTDM.PhrasesList.Count;
 
             var phrasesList = Execute();
@@ -24,7 +24,7 @@ namespace BusinessRules.ExtractiveSummarizer.Metaheuristics.GBHS
                 MyParameters.MaximumLengthOfSummaryForRouge, out SummaryByPhrases);
         }
 
-        public List<KeyValuePair<int, double>> Execute()
+        public List<PositionValue> Execute()
         {
             CurrentFFEs = 0;
             MaximumNumberOfFitnessFunctionEvaluations = MyParameters.MaximumNumberOfFitnessFunctionEvaluations;
@@ -33,24 +33,21 @@ namespace BusinessRules.ExtractiveSummarizer.Metaheuristics.GBHS
             CalculateRankingPhrasePosition();
             SortLengths();
 
-            ObtainViablePhrasesSortedByCosineCoverage();
-            HarmonyMemory = new List<BaseSolucionGBHS>();
+            HarmonyMemory = new List<Harmony>();
 
             // Population initialization, fitness is calculated for each agent and local search is applied
             for (var i = 0; i < myParameters.HMS; i++)
             {
-                var newAgent = new BaseSolucionGBHS(this);
-                newAgent.InicializarAleatorio();
+                var newAgent = new Harmony(this);
+                newAgent.RandomInitialization();
+
+                var improved = newAgent.Optimize();
+                if (improved != null) newAgent = improved;
+
                 HarmonyMemory.Add(newAgent);
                 if (CurrentFFEs > MaximumNumberOfFitnessFunctionEvaluations)  // MaxFFEs exceeded?
                     break;
             }
-            HarmonyMemoryFitnessUpdate();
-
-            for (var i = 0; i < myParameters.HMS; i++)
-                HarmonyMemory[i].Optimizar();
-
-            HarmonyMemoryFitnessUpdate();
 
             // Sort the population from highest to lowest fitness ... it is maximizing
             HarmonyMemory.Sort((x,y) => -1 * x.Fitness.CompareTo(y.Fitness));
@@ -58,48 +55,35 @@ namespace BusinessRules.ExtractiveSummarizer.Metaheuristics.GBHS
             while (CurrentFFEs < MaximumNumberOfFitnessFunctionEvaluations)
             {
                 var miPAR = ParGn(myParameters.ParMin, myParameters.ParMax, CurrentFFEs, MaximumNumberOfFitnessFunctionEvaluations);
-                var nuevoImproviso = new BaseSolucionGBHS(this);
-                var cantidadPalabras = 0;
-                var intentos = 0;
-
-                while (cantidadPalabras < MyParameters.MaximumLengthOfSummaryForRouge)
+                var nuevoImproviso = new Harmony(this);
+                var maxTries = HarmonyMemory[0].SelectedPhrases.Count;
+                var triesCounter = 0;
+                while (nuevoImproviso.SummaryLength < MyParameters.MaximumLengthOfSummaryForRouge)
                 {
                     int pos;
-                    if (MyParameters.NumeroAleatorio.NextDouble() < myParameters.HMCR)
+                    if (MyParameters.RandomGenerator.NextDouble() < myParameters.HMCR)
                     {                                
-                        var posEnMemoria = MyParameters.NumeroAleatorio.Next(myParameters.HMS);
-                        if (MyParameters.NumeroAleatorio.NextDouble() < miPAR)
+                        var posEnMemoria = MyParameters.RandomGenerator.Next(myParameters.HMS);
+                        if (MyParameters.RandomGenerator.NextDouble() < miPAR)
                             posEnMemoria = 0; // Choose the best harmony from harmony memory
 
-                        var posFrase = MyParameters.NumeroAleatorio.Next(HarmonyMemory[posEnMemoria].ActivePhrases.Count);
-                        pos = HarmonyMemory[posEnMemoria].ActivePhrases[posFrase];
+                        var posFrase = MyParameters.RandomGenerator.Next(HarmonyMemory[posEnMemoria].SelectedPhrases.Count);
+                        pos = HarmonyMemory[posEnMemoria].SelectedPhrases[posFrase];
                     }
                     else
                     {
-                        pos = MyParameters.NumeroAleatorio.Next(SolutionSize);
+                        pos = MyParameters.RandomGenerator.Next(SolutionSize);
                     }
+                    nuevoImproviso.Activate(pos);
 
-                    intentos++;
-                    if (intentos >= SolutionSize) break;
-                    if (nuevoImproviso.ActivePhrases.Contains(pos)) continue;
-
-                    nuevoImproviso.ActivePhrases.Add(pos);
-                    cantidadPalabras += MyTDM.PhrasesList[pos].Length;
+                    if (triesCounter++ > maxTries) break; // avoid long loop
                 }
 
-                var frasesSeleccionadas = new List<PositionValue>();
-                foreach (var posFrase in nuevoImproviso.ActivePhrases)
-                    frasesSeleccionadas.Add(new PositionValue(posFrase, MyTDM.PhrasesList[posFrase].SimilarityToDocument));
-                frasesSeleccionadas.Sort((x, y) => -1 * x.Value.CompareTo(y.Value));
-
-                nuevoImproviso.IncluirFrasesCumpliendoRestriccion(frasesSeleccionadas);
-                nuevoImproviso.AgregarFrasesValidas();
-
-                nuevoImproviso.ActivePhrases.Sort((x,y)=> x.CompareTo(y));
+                nuevoImproviso.AddValidPhrases();
                 nuevoImproviso.CalculateFitness();
-                nuevoImproviso.Optimizar();
 
-                HarmonyMemoryFitnessUpdate();
+                var improved = nuevoImproviso.Optimize();
+                if (improved != null) nuevoImproviso = improved;
 
                 if (!HarmonyMemory.Exists(x => x.Equals(nuevoImproviso)))
                     if (nuevoImproviso.Fitness > HarmonyMemory[HarmonyMemory.Count - 1].Fitness) // New harmony is better than the worst in the Harmony Memory?
@@ -113,11 +97,13 @@ namespace BusinessRules.ExtractiveSummarizer.Metaheuristics.GBHS
                     break;
             }
 
-            HarmonyMemory[0].OptimizationComplete();
-            var phrasesList = new List<KeyValuePair<int, double>>();
-            var total = HarmonyMemory[0].ActivePhrases.Count;
+            HarmonyMemory[0].CompleteSummaryBasedOnCoverage();
+
+            var phrasesList = new List<PositionValue>();
+            var total = HarmonyMemory[0].SelectedPhrases.Count;
             for (var i = 0; i < total ; i++)
-                phrasesList.Add(new KeyValuePair<int, double>(HarmonyMemory[0].ActivePhrases[i], total-i));
+                phrasesList.Add(new PositionValue(HarmonyMemory[0].SelectedPhrases[i], 
+                    total-i));
 
             return phrasesList;
         }
@@ -126,17 +112,6 @@ namespace BusinessRules.ExtractiveSummarizer.Metaheuristics.GBHS
         {
             var parGn = parMin + ((parMax - parMin) * (numCiclo * 1.0 / ni));
             return parGn;
-        }
-
-        private void HarmonyMemoryFitnessUpdate()
-        {
-            if (UpdateFitness)
-            {
-                for (var i = 0; i < ((GBHSParameters) MyParameters).HMS; i++)
-                    HarmonyMemory[i].CalculateFitness(true); // Fitness is recalculated with new ranges
-                HarmonyMemory.Sort((x, y) => -1 * x.Fitness.CompareTo(y.Fitness));
-                UpdateFitness = false;
-            }
         }
     }
 }

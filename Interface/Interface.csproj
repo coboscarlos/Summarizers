@@ -60,12 +60,6 @@
     <Compile Include="FrmExecuteAlgorithm.designer.cs">
       <DependentUpon>FrmExecuteAlgorithm.cs</DependentUpon>
     </Compile>
-    <Compile Include="FrmFSP.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="FrmFSP.designer.cs">
-      <DependentUpon>FrmFSP.cs</DependentUpon>
-    </Compile>
     <Compile Include="FrmMain.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -80,9 +74,6 @@
     <Compile Include="RougeEnParalelo.cs" />
     <EmbeddedResource Include="FrmExecuteAlgorithm.resx">
       <DependentUpon>FrmExecuteAlgorithm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="FrmFSP.resx">
-      <DependentUpon>FrmFSP.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="FrmMain.resx">
       <DependentUpon>FrmMain.cs</DependentUpon>

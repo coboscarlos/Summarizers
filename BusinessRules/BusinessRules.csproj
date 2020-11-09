@@ -68,21 +68,27 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ExtractiveSummarizer\Metaheuristics\BaseSolucion.Fitness.cs" />
+    <Compile Include="ExtractiveSummarizer\Metaheuristics\DiscreteSFLA\SFLAParameters.cs" />
+    <Compile Include="ExtractiveSummarizer\Metaheuristics\DiscreteSFLA\SFLA.cs" />
+    <Compile Include="ExtractiveSummarizer\Metaheuristics\DiscreteSFLA\Frog.cs" />
+    <Compile Include="ExtractiveSummarizer\Metaheuristics\DiscreteSFLA\TabuMemory.cs" />
+    <Compile Include="ExtractiveSummarizer\FinalOrderOfSummary.cs" />
     <Compile Include="VectorSpaceModel\SimilarityMatrix.cs" />
     <Compile Include="VectorSpaceModel\TDM.io.cs" />
     <Compile Include="VectorSpaceModel\TDMParameters.cs" />
     <Compile Include="ExtractiveSummarizer\SummarizerAlgorithm.cs" />
-    <Compile Include="ExtractiveSummarizer\Metaheuristics\AlgorithmBase.cs" />
+    <Compile Include="ExtractiveSummarizer\Metaheuristics\BaseAlgorithm.cs" />
     <Compile Include="ExtractiveSummarizer\Metaheuristics\GBHS\GBHS.cs" />
     <Compile Include="ExtractiveSummarizer\Metaheuristics\GBHS\GBHSParameters.cs" />
-    <Compile Include="ExtractiveSummarizer\Metaheuristics\GBHS\BaseSolucionGBHS.cs" />
-    <Compile Include="ExtractiveSummarizer\Metaheuristics\FSP\DiscreteFSP.cs" />
-    <Compile Include="ExtractiveSummarizer\Metaheuristics\FSP\DiscreteFSPParameters.cs" />
-    <Compile Include="ExtractiveSummarizer\Metaheuristics\FSP\DiscreteFSPSolution.cs" />
+    <Compile Include="ExtractiveSummarizer\Metaheuristics\GBHS\Harmony.cs" />
+    <Compile Include="ExtractiveSummarizer\Metaheuristics\DiscreteFSP\FSP.cs" />
+    <Compile Include="ExtractiveSummarizer\Metaheuristics\DiscreteFSP\FSPParameters.cs" />
+    <Compile Include="ExtractiveSummarizer\Metaheuristics\DiscreteFSP\FSPSolution.cs" />
     <Compile Include="ExtractiveSummarizer\Metaheuristics\BaseParameters.cs" />
     <Compile Include="ExtractiveSummarizer\Metaheuristics\BaseSolucion.cs" />
     <Compile Include="Utils\DUCDataSet.cs" />
-    <Compile Include="Utils\FitnessFunction.cs" />
+    <Compile Include="ExtractiveSummarizer\FitnessFunction.cs" />
     <Compile Include="Utils\PositionValue.cs" />
     <Compile Include="ExtractiveSummarizer\Graphs\ContinuousLexRank.cs" />
     <Compile Include="ExtractiveSummarizer\Graphs\DegreeCentralityLexRankParameters.cs" />
