@@ -16,7 +16,7 @@ namespace BusinessRules.ExtractiveSummarizer.Metaheuristics
         {
             MyContainer.CurrentFFEs++;
 
-            if (SummaryLength > MyContainer.MyParameters.MaximumSummaryLengthToEvolve)
+            if (SummaryLength > MyContainer.MyParameters.MaximumLengthOfSummaryForRouge)
             {
                 Fitness = 0;
                 return;
@@ -104,8 +104,8 @@ namespace BusinessRules.ExtractiveSummarizer.Metaheuristics
             Fitness = (alfa * PositionFactor) + 
                       (beta * TitleSimilarityFactor) + 
                       (gama * LengthFactor) +
-                      (delta * (CohesionFactor - MyContainer.MinCohesion) / MyContainer.RangeCohesion) +
-                      (ro * (CoverageFactor - MyContainer.MinCoverage) / MyContainer.RangeCoverage);
+                      (delta * CohesionFactor) +
+                      (ro * CoverageFactor);
         }
 
         /// <summary>

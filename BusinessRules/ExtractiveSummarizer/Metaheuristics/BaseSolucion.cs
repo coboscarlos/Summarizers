@@ -31,7 +31,6 @@ namespace BusinessRules.ExtractiveSummarizer.Metaheuristics
             SelectedPhrases.Add(positionPhrase);
             SelectedPhrases.Sort();
             UnselectedPhrases.Remove(positionPhrase);
-            UnselectedPhrases.Sort();
         }
 
         public void InActivate(int positionPhrase)
@@ -40,7 +39,6 @@ namespace BusinessRules.ExtractiveSummarizer.Metaheuristics
             _phrases[positionPhrase] = 0;
             SummaryLength -= MyContainer.MyTDM.PhrasesList[positionPhrase].Length;
             SelectedPhrases.Remove(positionPhrase);
-            SelectedPhrases.Sort();
             UnselectedPhrases.Add(positionPhrase);
             UnselectedPhrases.Sort();
         }
@@ -78,7 +76,9 @@ namespace BusinessRules.ExtractiveSummarizer.Metaheuristics
             CohesionFactor = origin.CohesionFactor;
             CoverageFactor = origin.CoverageFactor;
             SummaryLength = origin.SummaryLength;
-            for (var i = 0; i < MyContainer.MyTDM.PhrasesList.Count; i++) _phrases[i] = origin._phrases[i];
+            _phrases = new int [MyContainer.SolutionSize];
+            for (var i = 0; i < MyContainer.MyTDM.PhrasesList.Count; i++)
+                _phrases[i] = origin._phrases[i];
             SelectedPhrases = new List<int>();
             SelectedPhrases.AddRange(origin.SelectedPhrases);
             UnselectedPhrases = new List<int>();
@@ -109,12 +109,11 @@ namespace BusinessRules.ExtractiveSummarizer.Metaheuristics
         /// <returns></returns>
         public int CompareTo(BaseSolucion other)
         {
-            var minLon = MyContainer.MyParameters.MaximumLengthOfSummaryForRouge;
-            var maxLon = MyContainer.MyParameters.MaximumSummaryLengthToEvolve;
+            var maxLon = MyContainer.MyParameters.MaximumLengthOfSummaryForRouge;
             var thisLength = SummaryLength;
-            var soyValido = (thisLength >= minLon && thisLength <= maxLon);
+            var soyValido = (thisLength <= maxLon);
             var otherLength = other.SummaryLength;
-            var otroEsValido = (otherLength >= minLon && otherLength <= maxLon);
+            var otroEsValido = (otherLength <= maxLon);
             if (soyValido == otroEsValido) return -1 * Fitness.CompareTo(other.Fitness);
             if (soyValido) return -1;
             return 1;
@@ -128,7 +127,7 @@ namespace BusinessRules.ExtractiveSummarizer.Metaheuristics
                 selectedPhrases.Append(pos + ",");
             selectedPhrases.Remove(selectedPhrases.Length - 1, 1);
             selectedPhrases.Append("] ");
-            selectedPhrases.Append("L:" + SummaryLength.ToString("###") + "");
+            selectedPhrases.Append("L:" + SummaryLength.ToString("##0") + "");
             return selectedPhrases.ToString();
         }
 
@@ -149,14 +148,10 @@ namespace BusinessRules.ExtractiveSummarizer.Metaheuristics
             while (SummaryLength < MyContainer.MyParameters.MaximumLengthOfSummaryForRouge)
             {
                 var positions = ValidPhrases();
-                if (positions is null) break;
+                if (positions is null || positions.Count == 0) break;
 
-                int pos;
-                do
-                {
-                    pos = MyContainer.MyParameters.RandomGenerator.Next(positions.Count);
-                    pos = positions[pos];
-                } while (SelectedPhrases.Contains(pos));
+                var pos = MyContainer.MyParameters.RandomGenerator.Next(positions.Count);
+                pos = positions[pos];
                 Activate(pos);
             }
         }
@@ -164,23 +159,9 @@ namespace BusinessRules.ExtractiveSummarizer.Metaheuristics
         public List<int> ValidPhrases()
         {
             var availableSpace = MyContainer.MyParameters.MaximumLengthOfSummaryForRouge - SummaryLength;
-            var search = SelectedPhrases.Where(
+            var search = UnselectedPhrases.Where(
                 x => MyContainer.MyTDM.PhrasesList[x].Length < availableSpace);
             return search.ToList();
-        }
-
-        /// <summary>
-        /// Add sentences to the end of the solution to complete the size. Select phrases that have a
-        /// lot of coverage.
-        /// </summary>
-        public void CompleteSummaryBasedOnCoverage()
-        {
-            while (SummaryLength < MyContainer.MyParameters.MaximumLengthOfSummaryForRouge)
-            {
-                var viable = ViablePhrasesOrderedByCoverage();
-                if (viable is null) break;
-                Activate(viable[0].Position);
-            }
         }
 
         public List<PositionValue> ViablePhrasesOrderedByCoverage()

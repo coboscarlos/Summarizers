@@ -120,7 +120,6 @@ namespace Interface
                         DetailedReport = false,
                         MySummaryType = SummaryType.Words,
                         MaximumLengthOfSummaryForRouge = 100,
-                        MaximumSummaryLengthToEvolve = 110,
                         MyTDMParameters = new TDMParameters
                         {
                             MinimumFrequencyThresholdOfTermsForPhrase = 0, // 0 y 0 son los dos valores originales
@@ -136,11 +135,11 @@ namespace Interface
                         TheFitnessFunction = FitnessFunction.MASDS,
                         OptimizacionProbability = 0.4,
                         MaxNumberOfOptimizacions = 5,
-                        Alfa = 0.55,
-                        Beta = 0.15,
-                        Gamma = 0.10,
-                        Delta = 0.10,
-                        Ro = 0.10
+                        Alfa = 0.15,
+                        Beta = 0.04,
+                        Gamma = 0.09,
+                        Delta = 0.07,
+                        Ro = 0.65
                     };
                     break;
                 case "FSP":
@@ -149,7 +148,6 @@ namespace Interface
                         DetailedReport = false,
                         MySummaryType = SummaryType.Words,
                         MaximumLengthOfSummaryForRouge = 100,
-                        MaximumSummaryLengthToEvolve = 110,
                         MyTDMParameters = new TDMParameters
                         {
                             MinimumFrequencyThresholdOfTermsForPhrase = 0, // 0 y 0 son los dos valores originales
@@ -164,11 +162,11 @@ namespace Interface
                         L = 1,
                         M = 20,
                         C = 1,
-                        Alfa = 0.55,
-                        Beta = 0.15,
-                        Gamma = 0.10,
-                        Delta = 0.10,
-                        Ro = 0.10
+                        Alfa = 0.19,
+                        Beta = 0.05,
+                        Gamma = 0.06,
+                        Delta = 0.05,
+                        Ro = 0.65
                     };
                     break;
                 case "SFLA":
@@ -177,7 +175,6 @@ namespace Interface
                         DetailedReport = false,
                         MySummaryType = SummaryType.Words,
                         MaximumLengthOfSummaryForRouge = 100,
-                        MaximumSummaryLengthToEvolve = 110,
                         MyTDMParameters = new TDMParameters
                         {
                             MinimumFrequencyThresholdOfTermsForPhrase = 0, // 0 y 0 son los dos valores originales
@@ -194,11 +191,11 @@ namespace Interface
                         NumberOfMemeplexes = 5,
                         MaxLocalIterations = 10,
                         ProbabilityOfMutation = 0.06,
-                        Alfa = 0.55,
-                        Beta = 0.15,
-                        Gamma = 0.10,
-                        Delta = 0.10,
-                        Ro = 0.10,
+                        Alfa = 0.15,
+                        Beta = 0.04,
+                        Gamma = 0.09,
+                        Delta = 0.07,
+                        Ro = 0.65
                     };
                     break;
             }

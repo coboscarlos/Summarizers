@@ -18,13 +18,7 @@ namespace BusinessRules.ExtractiveSummarizer.Metaheuristics
         public double[] PhrasePositionRanking;
         public List<int> OrderedLengths;
 
-        public double RangeCoverage = 0.0;
-        public double MinCoverage = 1.0;
-
-        public double RangeCohesion = 0.0;
-        public double MinCohesion = 1.0;
-
-        protected List<PositionValue> SelectPhrasesFromFinalSummary(List<int> activePhrases)
+        protected List<PositionValue> SelectPhrasesFromFinalSummary(List<int> activePhrases, int additionalPhrase = -1)
         {
             var phrasesList = new List<PositionValue>();
 
@@ -35,6 +29,7 @@ namespace BusinessRules.ExtractiveSummarizer.Metaheuristics
                         phrasesList.Add(new PositionValue(frase, MyTDM.PhrasesList[frase].PositionInDocument));
                     }
                     phrasesList.Sort((x, y) => x.Value.CompareTo(y.Value));
+                    if (additionalPhrase != -1) phrasesList.Add(new PositionValue(additionalPhrase, MyTDM.PhrasesList.Count));
                     break;
 
                 case FinalOrderOfSummary.CRP:

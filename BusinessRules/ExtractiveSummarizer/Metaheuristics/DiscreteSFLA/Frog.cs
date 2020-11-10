@@ -30,7 +30,7 @@ namespace BusinessRules.ExtractiveSummarizer.Metaheuristics.DiscreteSFLA
                 }
             }
 
-            while (SummaryLength > MyContainer.MyParameters.MaximumSummaryLengthToEvolve)
+            while (SummaryLength > MyContainer.MyParameters.MaximumLengthOfSummaryForRouge)
             {
                 var pos = MyContainer.MyParameters.RandomGenerator.Next(SelectedPhrases.Count);
                 pos = SelectedPhrases[pos];

@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
+using System.Security.Policy;
 using BusinessRules.VectorSpaceModel;
 using BusinessRules.Utils;
 
@@ -54,17 +56,18 @@ namespace BusinessRules.ExtractiveSummarizer.Metaheuristics.GBHS
 
             while (CurrentFFEs < MaximumNumberOfFitnessFunctionEvaluations)
             {
-                var miPAR = ParGn(myParameters.ParMin, myParameters.ParMax, CurrentFFEs, MaximumNumberOfFitnessFunctionEvaluations);
-                var nuevoImproviso = new Harmony(this);
-                var maxTries = HarmonyMemory[0].SelectedPhrases.Count;
+                var myPAR = ParGn(myParameters.ParMin, myParameters.ParMax, CurrentFFEs, MaximumNumberOfFitnessFunctionEvaluations);
+                var newimprovisation = new Harmony(this);
+                var maxTries = 2 * HarmonyMemory[0].SelectedPhrases.Count;
+                if (maxTries > SolutionSize) maxTries = SolutionSize - 1;
                 var triesCounter = 0;
-                while (nuevoImproviso.SummaryLength < MyParameters.MaximumLengthOfSummaryForRouge)
+                while (newimprovisation.SummaryLength < MyParameters.MaximumLengthOfSummaryForRouge)
                 {
                     int pos;
                     if (MyParameters.RandomGenerator.NextDouble() < myParameters.HMCR)
                     {                                
                         var posEnMemoria = MyParameters.RandomGenerator.Next(myParameters.HMS);
-                        if (MyParameters.RandomGenerator.NextDouble() < miPAR)
+                        if (MyParameters.RandomGenerator.NextDouble() < myPAR)
                             posEnMemoria = 0; // Choose the best harmony from harmony memory
 
                         var posFrase = MyParameters.RandomGenerator.Next(HarmonyMemory[posEnMemoria].SelectedPhrases.Count);
@@ -74,22 +77,24 @@ namespace BusinessRules.ExtractiveSummarizer.Metaheuristics.GBHS
                     {
                         pos = MyParameters.RandomGenerator.Next(SolutionSize);
                     }
-                    nuevoImproviso.Activate(pos);
+                    if (newimprovisation.SummaryLength + MyTDM.PhrasesList[pos].Length <=
+                        MyParameters.MaximumLengthOfSummaryForRouge)
+                        newimprovisation.Activate(pos);
 
                     if (triesCounter++ > maxTries) break; // avoid long loop
                 }
 
-                nuevoImproviso.AddValidPhrases();
-                nuevoImproviso.CalculateFitness();
+                newimprovisation.AddValidPhrases();
+                newimprovisation.CalculateFitness();
 
-                var improved = nuevoImproviso.Optimize();
-                if (improved != null) nuevoImproviso = improved;
+                var improved = newimprovisation.Optimize();
+                if (improved != null) newimprovisation = improved;
 
-                if (!HarmonyMemory.Exists(x => x.Equals(nuevoImproviso)))
-                    if (nuevoImproviso.Fitness > HarmonyMemory[HarmonyMemory.Count - 1].Fitness) // New harmony is better than the worst in the Harmony Memory?
+                if (!HarmonyMemory.Exists(x => x.Equals(newimprovisation)))
+                    if (newimprovisation.Fitness > HarmonyMemory[HarmonyMemory.Count - 1].Fitness) // New harmony is better than the worst in the Harmony Memory?
                     {
                         HarmonyMemory.RemoveAt(HarmonyMemory.Count - 1);
-                        HarmonyMemory.Add(nuevoImproviso);
+                        HarmonyMemory.Add(newimprovisation);
                         HarmonyMemory.Sort((x, y) => -1*x.Fitness.CompareTo(y.Fitness));
                     }
 
@@ -97,15 +102,42 @@ namespace BusinessRules.ExtractiveSummarizer.Metaheuristics.GBHS
                     break;
             }
 
-            HarmonyMemory[0].CompleteSummaryBasedOnCoverage();
-
-            var phrasesList = new List<PositionValue>();
-            var total = HarmonyMemory[0].SelectedPhrases.Count;
-            for (var i = 0; i < total ; i++)
-                phrasesList.Add(new PositionValue(HarmonyMemory[0].SelectedPhrases[i], 
-                    total-i));
-
+            var mostRepeated = SelectToCompleteSummary();
+            
+            var phrasesList = SelectPhrasesFromFinalSummary(HarmonyMemory[0].SelectedPhrases, mostRepeated);
             return phrasesList;
+        }
+
+        private int SelectToCompleteSummary()
+        {
+            var listPhrases = new List<PositionValue>();
+            foreach (var t in HarmonyMemory)
+            {
+                foreach (var phrase in t.SelectedPhrases)
+                {
+                    if (listPhrases.Exists(x => x.Position == phrase))
+                    {
+                        var currentPhrase = listPhrases.Find(x => x.Position == phrase);
+                        currentPhrase.Value = currentPhrase.Value + 1;
+                    }
+                    else
+                    {
+                        var newPhrase = new PositionValue(phrase, 1);
+                        listPhrases.Add(newPhrase);
+                    }
+                }
+            }
+            listPhrases.Sort((x,y) => -1 * x.Value.CompareTo(y.Value));
+            foreach (var phrase in HarmonyMemory[0].SelectedPhrases)
+            {
+                if (listPhrases.Exists(x => x.Position == phrase))
+                {
+                    var currentPhrase = listPhrases.Find(x => x.Position == phrase);
+                    listPhrases.Remove(currentPhrase);
+                }
+            }
+
+            return listPhrases[0].Position;
         }
 
         private static double ParGn(double parMin, double parMax, int numCiclo, int ni)
