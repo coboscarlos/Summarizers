@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Diagnostics;
 using System.Threading;
+using System.Xml;
 using BusinessRules.VectorSpaceModel;
 
 namespace BusinessRules.Utils
@@ -65,12 +66,38 @@ namespace BusinessRules.Utils
         /// <param name="myDocumentPath">Path where is the file to read</param>
         public static string ReadNews(string myDocumentPath)
         {
-            var myContent = ValidateXmlTextInFile(myDocumentPath);
-            myContent = myContent.ToLower();
-            var start = myContent.IndexOf("<text>");
-            var end = myContent.IndexOf("</text>");
-            var myText = myContent.Substring(start + 6, end - start - 6);
+            var myText = "";
+            try
+            {
+                var myContent = ValidateXmlTextInFile(myDocumentPath);
+                var doc = new XmlDocument();
+                doc.LoadXml(myContent);
 
+                var s = "";
+                foreach (XmlElement node in doc.GetElementsByTagName("TEXT"))
+                    s += node.InnerText.Trim() + " ";
+                myText = s.Trim();
+
+                myText = myText.Replace("&amp;", "&");
+                myText = myText.Replace("&#39;", "'");
+                myText = myText.Replace("``", "''");
+                myText = myText.Replace(".''\n", ".''.\n");
+                myText = myText.Replace(".'' ", ".''. \n");
+                myText = myText.Replace(".' ", ".'. \n");
+                myText = myText.Replace(".;", ".\n");
+                myText = myText.Replace("!;", "!\n");
+                myText = myText.Replace("?;", "?\n");
+                myText = myText.Replace("w+{ ", "w+ {");
+                myText = myText.Replace("      ", " ");
+                myText = myText.Replace("     ", " ");
+                myText = myText.Replace("    ", " ");
+                myText = myText.Replace("   ", " ");
+                myText = myText.Replace("  ", " ");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("ERROR XMLFilePreProcessing.ReadNews : " + myDocumentPath + " -->" + e.Message);
+            }
             return myText;
         }
         
@@ -83,12 +110,74 @@ namespace BusinessRules.Utils
 
         public static string GetTitle(string myDocumentPath)
         {
-            var myContent = File.ReadAllText(myDocumentPath);
-            myContent = myContent.ToLower();
-            var start = myContent.IndexOf("<headline>");
-            var end = myContent.IndexOf("</headline>");
-            var myTitle = myContent.Substring(start + 10, end - start - 10);
+            var myTitle = "";
+            try
+            {
+                var xmlDoc = new XmlDocument();
+                xmlDoc.Load(myDocumentPath);
 
+                var nodosHead = xmlDoc.GetElementsByTagName("HEAD");
+                var nodosHeadLine = xmlDoc.GetElementsByTagName("HEADLINE");
+                var nodosHL = xmlDoc.GetElementsByTagName("HL");
+                var nodosH3 = xmlDoc.GetElementsByTagName("H3");
+
+
+                if (nodosHead.Count > 0)
+                {
+                    foreach (var nodo in nodosHead)
+                    {
+                        myTitle += (((XmlElement) nodo).InnerText).Replace("\r\n", " ");
+                        myTitle += " ";
+                    }
+                }
+                else if (nodosHeadLine.Count > 0)
+                {
+                    foreach (var nodo in nodosHeadLine)
+                    {
+                        var elementosP = ((XmlElement) nodo).GetElementsByTagName("P");
+
+                        if (elementosP.Count > 0)
+                        {
+                            foreach (var p in elementosP)
+                            {
+                                myTitle += (((XmlElement) p).InnerText).Replace("\r\n", " ");
+                                myTitle += " ";
+                            }
+                        }
+                        else
+                        {
+                            myTitle += (((XmlElement) nodo).InnerText).Replace("\r\n", " ");
+                            myTitle += " ";
+                        }
+                    }
+                }
+                else if (nodosHL.Count > 0)
+                {
+                    foreach (var nodo in nodosHL)
+                    {
+                        myTitle += (((XmlElement) nodo).InnerText).Replace("@", "");
+                        myTitle += (((XmlElement) nodo).InnerText).Replace("\r\n", " ");
+                        myTitle += " ";
+                    }
+                }
+                else if (nodosH3.Count > 0)
+                {
+                    foreach (var nodo in nodosH3)
+                    {
+                        var elementosTi = ((XmlElement) nodo).GetElementsByTagName("TI");
+
+                        foreach (var ti in elementosTi)
+                        {
+                            myTitle += (((XmlElement) ti).InnerText).Replace("\r\n", " ");
+                            myTitle += " ";
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("ERROR XMLFilePreProcessing.GetTitle : " + myDocumentPath + " -->" + e.Message);
+            }
             return myTitle;
         }      
    }

@@ -20,12 +20,9 @@
             myText = myText.Replace("&Cx13;", "[Cx13]");
 
             //Special characters in XML
-            myText = myText.Replace("&amp;", "&");
-            myText = myText.Replace("&#38;", "&");
-            myText = myText.Replace("&#39;", "'");
-            //myText = myText.Replace("&", "&amp;");
-            //myText = myText.Replace("&#38;", "&amp;");
-            //myText = myText.Replace("'", "&#39;");
+            myText = myText.Replace("&", "&amp;");
+            myText = myText.Replace("&#38;", "&amp;");
+            myText = myText.Replace("'", "&#39;");
 
             myText = myText.Replace("", "");
             myText = myText.Replace("", "");
