@@ -15,50 +15,54 @@ namespace Interface
 {
     class TestSummarizers
     {
-        public void Ejecutar(DUCDataSet midataset, SummaryParameters misParametros, int idEjecucion, int totalEjecuciones, string algoritmo)
+        public void Ejecutar(DUCDataSet midataset, SummaryParameters myParameters, 
+            int idEjecution, int maxRepetitions, string theAlgorithm)
         {
             //Se establece el Identification de la ejecucion y se crea el directorio de salida
-            var directorioDeSalida = midataset.RougeRootDirectory + @"experimentos\" + idEjecucion.ToString("0000");
+            var directorioDeSalida = midataset.RougeRootDirectory + @"experimentos\" + idEjecution.ToString("0000");
             Directory.CreateDirectory(directorioDeSalida);
 
             //Se define el nombre del archivo en el que se colocaran los resultados por medio de los parámetros de ejecución.
-            var fecha = DateTime.Now.Year + "-" + DateTime.Now.Month.ToString("00") + "-" + DateTime.Now.Day.ToString("00") + "-" + DateTime.Now.Hour.ToString("00") + "-" + DateTime.Now.Minute.ToString("00");
-            var nombreArchivoDeSalida = fecha + "-Exp-" + totalEjecuciones + "-" + misParametros + ".xlsx";
-            nombreArchivoDeSalida = nombreArchivoDeSalida.Replace(",", ".");
+            var theDate = DateTime.Now.Year + "-" + DateTime.Now.Month.ToString("00") + "-" + DateTime.Now.Day.ToString("00") + "-" + DateTime.Now.Hour.ToString("00") + "-" + DateTime.Now.Minute.ToString("00");
+            var outputFileName = theDate + "-Exp-" + maxRepetitions + "-" + myParameters + ".xlsx";
+            outputFileName = outputFileName.Replace(",", ".");
 
-            var listaDeDirectorios = new List<string>();
-            listaDeDirectorios.AddRange(Directory.GetDirectories(midataset.RougeRootDirectory + "documents")); //Tiene la ruta de cada documento
-            listaDeDirectorios.Sort();
+            var directoryList = new List<string>();
+            directoryList.AddRange(Directory.GetDirectories(midataset.RougeRootDirectory + "documents")); //Tiene la ruta de cada documento
+            directoryList.Sort();
 
-            var contadorarchivos = 0;
+            var fileAccount = 0;
 
-            var todasLasNoticiasFull = new List<string>();
-            foreach (var elDirectorioFull in listaDeDirectorios) //Recorre cada directorio de documentos y hace ...
+            var allFullNews = new List<string>();
+            foreach (var fullDirectory in directoryList) //Recorre cada directorio de documentos y hace ...
             {
-                var lasNoticiasFull = Directory.GetFiles(elDirectorioFull);
-                todasLasNoticiasFull.AddRange(lasNoticiasFull);
+                var lasNoticiasFull = Directory.GetFiles(fullDirectory);
+                allFullNews.AddRange(lasNoticiasFull);
             }
 
-            foreach (var laNoticiaCompleta in todasLasNoticiasFull)
+            foreach (var fullNews in allFullNews)
             {
-                contadorarchivos++;
-                var laNoticiaFull = laNoticiaCompleta;
-                var x = new FileInfo(laNoticiaFull);
-                var laNoticia = x.Name; //Deja solo el nombre de la noticia
-                Debug.WriteLine(laNoticia + " " + contadorarchivos);
+                fileAccount++;
+                var theFullNews = fullNews;
+                var x = new FileInfo(theFullNews);
+                var thisNews = x.Name; //Deja solo el nombre de la noticia
+                Debug.WriteLine(thisNews + " " + fileAccount);
 
-                var nombreArchivosCache = midataset.MatricesRootDirectory + laNoticia + "-" +
-                                            misParametros.MyTDMParameters.MinimumFrequencyThresholdOfTermsForPhrase + "-" +
-                                            misParametros.MyTDMParameters.MinimumThresholdForTheAcceptanceOfThePhrase + "-" +
-                                            misParametros.MyTDMParameters.TheTFIDFWeight  + "-" +
-                                            misParametros.MyTDMParameters.TheDocumentRepresentation;
+                var nombreArchivosCache = midataset.MatricesRootDirectory + thisNews + "-" +
+                                            myParameters.MyTDMParameters.MinimumFrequencyThresholdOfTermsForPhrase + "-" +
+                                            myParameters.MyTDMParameters.MinimumThresholdForTheAcceptanceOfThePhrase + "-" +
+                                            myParameters.MyTDMParameters.TheTFIDFWeight  + "-" +
+                                            myParameters.MyTDMParameters.TheDocumentRepresentation;
                 nombreArchivosCache = nombreArchivosCache.Replace(",", ".");
 
-                //Parallel.For(0, totalEjecuciones, ejecucion =>
-                for (var ejecucion=0; ejecucion < totalEjecuciones; ejecucion++)
+                //Parallel.For(0, maxRepetitions, repetition =>
+                for (var repetition=0; repetition < maxRepetitions; repetition++)
                 {
+                    //if (laNoticia != "LA042190-0060")
+                    //    continue;
+
                     // Create the experiment folder If it does not exists
-                    var directorioExperimento = directorioDeSalida + @"\" + ejecucion.ToString("000");
+                    var directorioExperimento = directorioDeSalida + @"\" + repetition.ToString("000");
                     if (!Directory.Exists(directorioExperimento))
                         Directory.CreateDirectory(directorioExperimento);
 
@@ -66,53 +70,54 @@ namespace Interface
                     if (!Directory.Exists(directorioExperimento))
                         Directory.CreateDirectory(directorioExperimento);
 
-                    SummarizerAlgorithm sumarizador = null;
-                    switch (algoritmo)
+                    SummarizerAlgorithm summarizer = null;
+                    switch (theAlgorithm)
                     {
                         case "ContinuousLexRank":
-                            sumarizador = new ContinuousLexRank();
-                            sumarizador.Summarize(misParametros, laNoticiaFull, nombreArchivosCache);
+                            summarizer = new ContinuousLexRank();
+                            summarizer.Summarize(myParameters, theFullNews, nombreArchivosCache);
                             break;
                         case "DegreeCentralityLexRank":
-                            sumarizador = new DegreeCentralityLexRank();
-                            sumarizador.Summarize(misParametros, laNoticiaFull, nombreArchivosCache);
+                            summarizer = new DegreeCentralityLexRank();
+                            summarizer.Summarize(myParameters, theFullNews, nombreArchivosCache);
                             break;
                         case "LexRankWithThreshold":
-                            sumarizador = new LexRankWithThreshold();
-                            sumarizador.Summarize(misParametros, laNoticiaFull, nombreArchivosCache);
+                            summarizer = new LexRankWithThreshold();
+                            summarizer.Summarize(myParameters, theFullNews, nombreArchivosCache);
                             break;
                         case "FSP":
-                            ((FSPParameters) misParametros).RandomGenerator = new Random(ejecucion);
-                            sumarizador = new FSP();
-                            sumarizador.Summarize(misParametros, laNoticiaFull, nombreArchivosCache);
+                            ((FSPParameters) myParameters).RandomGenerator = new Random(repetition);
+                            summarizer = new FSP();
+                            summarizer.Summarize(myParameters, theFullNews, nombreArchivosCache);
                             break;
                         case "GBHS":
-                            ((GBHSParameters) misParametros).RandomGenerator = new Random(ejecucion);
-                            sumarizador = new GBHS();
-                            sumarizador.Summarize(misParametros, laNoticiaFull, nombreArchivosCache);
+                            ((GBHSParameters) myParameters).RandomGenerator = new Random(repetition);
+                            summarizer = new GBHS();
+                            summarizer.Summarize(myParameters, theFullNews, nombreArchivosCache);
                             break;
                         case "SFLA":
-                            ((SFLAParameters)misParametros).RandomGenerator = new Random(ejecucion);
-                            sumarizador = new SFLA();
-                            sumarizador.Summarize(misParametros, laNoticiaFull, nombreArchivosCache);
+                            ((SFLAParameters)myParameters).RandomGenerator = new Random(repetition);
+                            summarizer = new SFLA();
+                            summarizer.Summarize(myParameters, theFullNews, nombreArchivosCache);
                             break;
                     }
-                    if (sumarizador != null)
+                    if (summarizer != null)
                     {
-                        var contenidoResumenFinal = sumarizador.TextSummary;
-                        File.WriteAllText(directorioExperimento + @"\" + laNoticia, contenidoResumenFinal);
+                        var contenidoResumenFinal = summarizer.TextSummary;
+                        File.WriteAllText(directorioExperimento + @"\" + thisNews, contenidoResumenFinal);
                     }
-
+                    Debug.Write(repetition + ", ");
                 } // Fin de for
                 //}); // Fin de Parallel.For
-
-                Debug.WriteLine("THREAD :" + Thread.CurrentThread.ManagedThreadId + " Termino " + laNoticia);
+                Debug.WriteLine("");
+                Debug.WriteLine("THREAD :" + Thread.CurrentThread.ManagedThreadId + 
+                                " NEWS " + thisNews);
             }
 
-            Debug.WriteLine("EMPIEZA A EVALUAR");
+            Debug.WriteLine("--- EVALUATING ---");
 
             // Se realizan los Calculus de ROUGE para todos los experimentos de la segunda forma (segun normas exactas de DUC 2005)
-            Parallel.For(0, totalEjecuciones, experimento =>
+            Parallel.For(0, maxRepetitions, experimento =>
             {
                 var directorioExperimento = directorioDeSalida + @"\" + experimento.ToString("000");
                 Rouge.EvaluateAnExperimentWithAllNewsPartA(midataset.RougeRootDirectory, directorioExperimento);
@@ -121,7 +126,7 @@ namespace Interface
             var salidaExperimentos = "Exp.\tR1R\tR1P\tR1F\tR2R\tR2P\tR2F\tRLR\tRLP\tRLF\tRSU4R\tRSU4P\tRSU4F\r\n";
             var resumenTodosExperimentos = new double[12];
             var subtotalesPorGrupoEvaluador = new SubTotalsByDataSet();
-            for (var experimento = 0; experimento < totalEjecuciones; experimento++)
+            for (var experimento = 0; experimento < maxRepetitions; experimento++)
             {
                 var directorioExperimento = directorioDeSalida + @"\" + experimento.ToString("000");
                 var resultadoEstaNoticia = new double[12];
@@ -138,10 +143,10 @@ namespace Interface
             }
 
             salidaExperimentos += "TOTAL\t";
-            var salidaGlobal = nombreArchivoDeSalida + "\t";
+            var salidaGlobal = outputFileName + "\t";
             for (var i = 0; i < 12; i++)
             {
-                resumenTodosExperimentos[i] = resumenTodosExperimentos[i] / totalEjecuciones;
+                resumenTodosExperimentos[i] = resumenTodosExperimentos[i] / maxRepetitions;
                 salidaExperimentos += resumenTodosExperimentos[i] + "\t";
                 salidaGlobal += resumenTodosExperimentos[i] + "\t";
             }

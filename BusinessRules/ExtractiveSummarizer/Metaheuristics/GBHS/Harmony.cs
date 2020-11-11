@@ -2,12 +2,12 @@
 
 namespace BusinessRules.ExtractiveSummarizer.Metaheuristics.GBHS
 {
-    public class Harmony : BaseSolucion
+    public class Harmony : BaseSolution
     {
         public Harmony(BaseAlgorithm myContainer): base (myContainer){
         }
 
-        public Harmony(BaseSolucion origin): base(origin) {
+        public Harmony(BaseSolution origin): base(origin) {
         }
 
         /// <summary>
@@ -49,7 +49,7 @@ namespace BusinessRules.ExtractiveSummarizer.Metaheuristics.GBHS
             {
                 var newCandidateSolution = new Harmony(copyCurrentSolution);
                 // Try to add C or more phrases to complete the solution
-                newCandidateSolution.AddValidPhrases();
+                newCandidateSolution.AddValidPhrases(new List<int>());
                 newCandidateSolution.CalculateFitness();
                 candidateSolutionsGenerated.Add(newCandidateSolution);
             }

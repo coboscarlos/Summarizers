@@ -68,11 +68,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ExtractiveSummarizer\Metaheuristics\BaseSolucion.Fitness.cs" />
+    <Compile Include="ExtractiveSummarizer\Metaheuristics\BaseSolution.Fitness.cs" />
     <Compile Include="ExtractiveSummarizer\Metaheuristics\DiscreteSFLA\SFLAParameters.cs" />
     <Compile Include="ExtractiveSummarizer\Metaheuristics\DiscreteSFLA\SFLA.cs" />
     <Compile Include="ExtractiveSummarizer\Metaheuristics\DiscreteSFLA\Frog.cs" />
-    <Compile Include="ExtractiveSummarizer\Metaheuristics\DiscreteSFLA\TabuMemory.cs" />
+    <Compile Include="ExtractiveSummarizer\Metaheuristics\TabuMemory.cs" />
     <Compile Include="ExtractiveSummarizer\FinalOrderOfSummary.cs" />
     <Compile Include="VectorSpaceModel\SimilarityMatrix.cs" />
     <Compile Include="VectorSpaceModel\TDM.io.cs" />
@@ -86,7 +86,7 @@
     <Compile Include="ExtractiveSummarizer\Metaheuristics\DiscreteFSP\FSPParameters.cs" />
     <Compile Include="ExtractiveSummarizer\Metaheuristics\DiscreteFSP\FSPSolution.cs" />
     <Compile Include="ExtractiveSummarizer\Metaheuristics\BaseParameters.cs" />
-    <Compile Include="ExtractiveSummarizer\Metaheuristics\BaseSolucion.cs" />
+    <Compile Include="ExtractiveSummarizer\Metaheuristics\BaseSolution.cs" />
     <Compile Include="Utils\DUCDataSet.cs" />
     <Compile Include="ExtractiveSummarizer\FitnessFunction.cs" />
     <Compile Include="Utils\PositionValue.cs" />

@@ -1,6 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
-using System.Security.Policy;
 using BusinessRules.VectorSpaceModel;
 using BusinessRules.Utils;
 
@@ -9,8 +7,6 @@ namespace BusinessRules.ExtractiveSummarizer.Metaheuristics.GBHS
     public class GBHS: BaseAlgorithm
     {
         public List<Harmony> HarmonyMemory;
-
-        public int OportunidadSA;
 
         public override void Summarize(SummaryParameters mySummaryParameters, string newsDirectory, string cacheFileName)
         {
@@ -84,7 +80,7 @@ namespace BusinessRules.ExtractiveSummarizer.Metaheuristics.GBHS
                     if (triesCounter++ > maxTries) break; // avoid long loop
                 }
 
-                newimprovisation.AddValidPhrases();
+                newimprovisation.AddValidPhrases(new List<int>());
                 newimprovisation.CalculateFitness();
 
                 var improved = newimprovisation.Optimize();
@@ -102,42 +98,12 @@ namespace BusinessRules.ExtractiveSummarizer.Metaheuristics.GBHS
                     break;
             }
 
-            var mostRepeated = SelectToCompleteSummary();
-            
-            var phrasesList = SelectPhrasesFromFinalSummary(HarmonyMemory[0].SelectedPhrases, mostRepeated);
+            var mostRepeated = SelectToCompleteSummary(
+                new List<BaseSolution>(HarmonyMemory), HarmonyMemory[0]);
+            var phrasesList = SelectPhrasesFromFinalSummary(HarmonyMemory[0].SelectedPhrases, 
+                mostRepeated);
+
             return phrasesList;
-        }
-
-        private int SelectToCompleteSummary()
-        {
-            var listPhrases = new List<PositionValue>();
-            foreach (var t in HarmonyMemory)
-            {
-                foreach (var phrase in t.SelectedPhrases)
-                {
-                    if (listPhrases.Exists(x => x.Position == phrase))
-                    {
-                        var currentPhrase = listPhrases.Find(x => x.Position == phrase);
-                        currentPhrase.Value = currentPhrase.Value + 1;
-                    }
-                    else
-                    {
-                        var newPhrase = new PositionValue(phrase, 1);
-                        listPhrases.Add(newPhrase);
-                    }
-                }
-            }
-            listPhrases.Sort((x,y) => -1 * x.Value.CompareTo(y.Value));
-            foreach (var phrase in HarmonyMemory[0].SelectedPhrases)
-            {
-                if (listPhrases.Exists(x => x.Position == phrase))
-                {
-                    var currentPhrase = listPhrases.Find(x => x.Position == phrase);
-                    listPhrases.Remove(currentPhrase);
-                }
-            }
-
-            return listPhrases[0].Position;
         }
 
         private static double ParGn(double parMin, double parMax, int numCiclo, int ni)

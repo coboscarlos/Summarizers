@@ -6,7 +6,7 @@ using BusinessRules.Utils;
 
 namespace BusinessRules.ExtractiveSummarizer.Metaheuristics
 {
-    public abstract partial class BaseSolucion : IEquatable<BaseSolucion>, IComparable<BaseSolucion>
+    public abstract partial class BaseSolution : IEquatable<BaseSolution>, IComparable<BaseSolution>
     {
         public BaseAlgorithm MyContainer;
 
@@ -47,7 +47,7 @@ namespace BusinessRules.ExtractiveSummarizer.Metaheuristics
         /// Default constructor
         /// </summary>
         /// <param name="myContainer"></param>
-        protected BaseSolucion(BaseAlgorithm myContainer)
+        protected BaseSolution(BaseAlgorithm myContainer)
         {
             MyContainer = myContainer;
             SummaryLength = 0;
@@ -66,7 +66,7 @@ namespace BusinessRules.ExtractiveSummarizer.Metaheuristics
         /// Copy constructor
         /// </summary>
         /// <param name="origin"></param>
-        protected BaseSolucion(BaseSolucion origin)
+        protected BaseSolution(BaseSolution origin)
         {
             MyContainer = origin.MyContainer;
             Fitness = origin.Fitness;
@@ -91,7 +91,7 @@ namespace BusinessRules.ExtractiveSummarizer.Metaheuristics
         /// </summary>
         /// <param name="other"></param>
         /// <returns></returns>
-        public bool Equals(BaseSolucion other)
+        public bool Equals(BaseSolution other)
         {
             if (other is null) return false;
             var thisPhrases = SelectedPhrases;
@@ -107,7 +107,7 @@ namespace BusinessRules.ExtractiveSummarizer.Metaheuristics
         /// </summary>
         /// <param name="other"></param>
         /// <returns></returns>
-        public int CompareTo(BaseSolucion other)
+        public int CompareTo(BaseSolution other)
         {
             var maxLon = MyContainer.MyParameters.MaximumLengthOfSummaryForRouge;
             var thisLength = SummaryLength;
@@ -136,18 +136,18 @@ namespace BusinessRules.ExtractiveSummarizer.Metaheuristics
         /// </summary>
         public void RandomInitialization()
         {
-            AddValidPhrases();
+            AddValidPhrases(new List<int>());
             CalculateFitness();
         }
 
         /// <summary>
         /// Include as many phrases as possible (randomly) while the summary is still feasible
         /// </summary>
-        public void AddValidPhrases()
+        public void AddValidPhrases(List<int> excludePhrases)
         {
             while (SummaryLength < MyContainer.MyParameters.MaximumLengthOfSummaryForRouge)
             {
-                var positions = ValidPhrases();
+                var positions = ValidPhrases(excludePhrases);
                 if (positions is null || positions.Count == 0) break;
 
                 var pos = MyContainer.MyParameters.RandomGenerator.Next(positions.Count);
@@ -156,17 +156,20 @@ namespace BusinessRules.ExtractiveSummarizer.Metaheuristics
             }
         }
 
-        public List<int> ValidPhrases()
+        public List<int> ValidPhrases(List<int> excludePhrases)
         {
-            var availableSpace = MyContainer.MyParameters.MaximumLengthOfSummaryForRouge - SummaryLength;
+            var availableSpace = MyContainer.MyParameters.MaximumLengthOfSummaryForRouge 
+                                 - SummaryLength;
             var search = UnselectedPhrases.Where(
-                x => MyContainer.MyTDM.PhrasesList[x].Length < availableSpace);
-            return search.ToList();
+                x => MyContainer.MyTDM.PhrasesList[x].Length < availableSpace).ToList();
+
+            var search2 = search.Where(x => !excludePhrases.Exists(z => z==x)).ToList();
+            return search2;
         }
 
         public List<PositionValue> ViablePhrasesOrderedByCoverage()
         {
-            var positions = ValidPhrases();
+            var positions = ValidPhrases(new List<int>());
             if (positions is null) return null;
 
             var viable = positions.Select(t => new

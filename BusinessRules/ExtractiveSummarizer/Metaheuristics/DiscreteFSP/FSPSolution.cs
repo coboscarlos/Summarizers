@@ -2,38 +2,35 @@
 
 namespace BusinessRules.ExtractiveSummarizer.Metaheuristics.DiscreteFSP
 {
-    public class FSPSolution : BaseSolucion
+    public class FSPSolution : BaseSolution
     {   
         public FSPSolution(BaseAlgorithm myContainer): base(myContainer){
         }
 
-        public FSPSolution(BaseSolucion origin): base (origin){
+        public FSPSolution(BaseSolution origin): base (origin){
         }
 
-        public FSPSolution ThrowFishingNet(int c)
+        public FSPSolution GenerateNeighbor(TabuMemory explicitLocalTabuMemory)
         {
             var copyCurrentSolution = new FSPSolution(this);
             var selectedPhrases = copyCurrentSolution.ObtainSelectedPhrasesSortedByCoverageCosine();
-            // Remove the last C sentences (phrases with low coverage) or total phrases if there are few selected ones
-            var maxC = selectedPhrases.Count > c ? c : selectedPhrases.Count / 2;
-                for (var j = 0; j < maxC; j++)
-                {
-                    copyCurrentSolution.InActivate(selectedPhrases[selectedPhrases.Count - 1].Position);
-                    selectedPhrases.RemoveAt(selectedPhrases.Count - 1);
-                }
+            // Remove the last sentence (phrases with low coverage) ... C = 1
+            copyCurrentSolution.InActivate(selectedPhrases[selectedPhrases.Count - 1].Position);
+            var excludePhrases = new List<int> {selectedPhrases[selectedPhrases.Count - 1].Position};
 
-            var candidateSolutionsGenerated = new List<FSPSolution>();
-            for (var i = 0; i < ((FSPParameters)((FSP)MyContainer).MyParameters).M; i++)
+            var tries = 0;
+            const int maxTries = 5;
+            FSPSolution newCandidateSolution = null;
+            do
             {
-                var newCandidateSolution = new FSPSolution(copyCurrentSolution);
-                // Try to add C or more phrases to complete the solution
-                newCandidateSolution.AddValidPhrases();
-                newCandidateSolution.CalculateFitness();
-                candidateSolutionsGenerated.Add(newCandidateSolution);
-            }
-            candidateSolutionsGenerated.Sort((x, y) => -1 * x.Fitness.CompareTo(y.Fitness));
+                newCandidateSolution = new FSPSolution(copyCurrentSolution);
+                // Try to add one or more randomly selected phrases to complete the solution
+                newCandidateSolution.AddValidPhrases(excludePhrases);
+                if (tries++ < maxTries) break; // avoid long time in the loop
+            } while (explicitLocalTabuMemory.IsTabu(newCandidateSolution.SelectedPhrases));
+            newCandidateSolution.CalculateFitness();
 
-            return candidateSolutionsGenerated[0].Fitness > Fitness ? candidateSolutionsGenerated[0] : new FSPSolution(this);
+            return newCandidateSolution;
         }
     }
 }

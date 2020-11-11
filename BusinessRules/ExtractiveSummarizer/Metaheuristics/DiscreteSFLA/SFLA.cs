@@ -53,7 +53,7 @@ namespace BusinessRules.ExtractiveSummarizer.Metaheuristics.DiscreteSFLA
                 frog.RandomInitialization();
                 if (MyTabuMemory.IsTabu(frog.SelectedPhrases)) continue;
                 Pond.Add(frog);
-                MyTabuMemory.Include(frog);
+                MyTabuMemory.Include(frog.SelectedPhrases);
             }
 
             Pond.Sort((x, y) => -1 * x.Fitness.CompareTo(y.Fitness));
@@ -69,7 +69,10 @@ namespace BusinessRules.ExtractiveSummarizer.Metaheuristics.DiscreteSFLA
                 Pond.Sort((x, y) => -1 * x.Fitness.CompareTo(y.Fitness));
                 GBest = new Frog(Pond[0]);
             }
-            var listaFrases = SelectPhrasesFromFinalSummary(GBest.SelectedPhrases);  
+            var mostRepeated = SelectToCompleteSummary(
+                new List<BaseSolution>(Pond), GBest);
+            var listaFrases = SelectPhrasesFromFinalSummary(
+                GBest.SelectedPhrases, mostRepeated);  
             return listaFrases;
         }
 

@@ -2,11 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 
-using BusinessRules.Utils;
-
 namespace BusinessRules.ExtractiveSummarizer.Metaheuristics
 {
-    public abstract partial class BaseSolucion
+    public abstract partial class BaseSolution
     {
         /// <summary>
         /// Calculate the fitness of the solution. You MUST make sure that the Summary Length was

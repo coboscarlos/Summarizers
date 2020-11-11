@@ -18,51 +18,100 @@ namespace BusinessRules.ExtractiveSummarizer.Metaheuristics
         public double[] PhrasePositionRanking;
         public List<int> OrderedLengths;
 
-        protected List<PositionValue> SelectPhrasesFromFinalSummary(List<int> activePhrases, int additionalPhrase = -1)
+        protected List<PositionValue> SelectToCompleteSummary(List<BaseSolution> population,
+            BaseSolution best)
         {
             var phrasesList = new List<PositionValue>();
+            foreach (var t in population)
+            {
+                foreach (var phrase in t.SelectedPhrases)
+                {
+                    if (phrasesList.Exists(x => x.Position == phrase))
+                    {
+                        var currentPhrase = phrasesList.Find(x 
+                            => x.Position == phrase);
+                        currentPhrase.Value = currentPhrase.Value + 1;
+                    }
+                    else
+                    {
+                        var newPhrase = new PositionValue(phrase, 1);
+                        phrasesList.Add(newPhrase);
+                    }
+                }
+            }
+            phrasesList.Sort((x, y) => -1 * 
+                                       x.Value.CompareTo(y.Value));
+            foreach (var phrase in best.SelectedPhrases)
+            {
+                if (phrasesList.Exists(x => x.Position == phrase))
+                {
+                    var currentPhrase = phrasesList.Find(x => 
+                        x.Position == phrase);
+                    phrasesList.Remove(currentPhrase);
+                }
+            }
+
+            return phrasesList;
+        }
+
+        protected List<PositionValue> SelectPhrasesFromFinalSummary(
+            List<int> selectedPhrases, List<PositionValue> additionalPhrase)
+        {
+            var phrasesList = new List<PositionValue>();
+            if (additionalPhrase.Count > 0)
+            {
+                foreach (var phrase in additionalPhrase)
+                    phrase.Value = 0;
+            }
 
             switch (MyParameters.TheFinalOrderOfSummary)
             {
                 case FinalOrderOfSummary.Position:
-                    foreach (var frase in activePhrases){
-                        phrasesList.Add(new PositionValue(frase, MyTDM.PhrasesList[frase].PositionInDocument));
+                    foreach (var frase in selectedPhrases){
+                        phrasesList.Add(new PositionValue(frase, 
+                            MyTDM.PhrasesList[frase].PositionInDocument));
                     }
-                    phrasesList.Sort((x, y) => x.Value.CompareTo(y.Value));
-                    if (additionalPhrase != -1) phrasesList.Add(new PositionValue(additionalPhrase, MyTDM.PhrasesList.Count));
+                    phrasesList.Sort((x, y) => 
+                        x.Value.CompareTo(y.Value));
+                    phrasesList.AddRange(additionalPhrase);
                     break;
 
                 case FinalOrderOfSummary.CRP:
-                    foreach (var frase in activePhrases){
-                        phrasesList.Add(new PositionValue(frase, MyTDM.PhrasesList[frase].SimilarityToDocument));
+                    foreach (var frase in selectedPhrases){
+                        phrasesList.Add(new PositionValue(frase, 
+                            MyTDM.PhrasesList[frase].SimilarityToDocument));
                     }
-                    phrasesList.Sort((x, y) => -1 * x.Value.CompareTo(y.Value));
+                    phrasesList.Sort((x, y) => -1 * 
+                                               x.Value.CompareTo(y.Value));
+                    phrasesList.AddRange(additionalPhrase);
                     break;
 
                 case FinalOrderOfSummary.MASDS:
-                    var size = activePhrases.Count;
+                    var size = selectedPhrases.Count;
                     var avgLength = 0.0;
                     for (var i = 0; i < size; i++)
-                        avgLength += MyTDM.PhrasesList[activePhrases[i]].Length;
+                        avgLength += MyTDM.PhrasesList[selectedPhrases[i]].Length;
                     avgLength = avgLength / size;
 
                     var stdLength = 0.0;
                     for (var i = 0; i < size; i++)
-                        stdLength += Math.Pow((MyTDM.PhrasesList[activePhrases[i]].Length - avgLength), 2);
+                        stdLength += Math.Pow((MyTDM.PhrasesList[selectedPhrases[i]].Length 
+                                               - avgLength), 2);
                     stdLength = Math.Sqrt(stdLength / size);
 
-                    foreach (var thisPhrase in activePhrases)
+                    foreach (var thisPhrase in selectedPhrases)
                     {
                         var longitud = MyTDM.PhrasesList[thisPhrase].Length;
                         var complement = Math.Exp((-longitud - avgLength) / stdLength);
 
                         var cs = 0.0;
-                        foreach (var otrafrase in activePhrases)
+                        foreach (var otrafrase in selectedPhrases)
                             if (otrafrase != thisPhrase)
-                                cs += MyExternalMDS.GetCosineSimilarityBetweenPhrases(thisPhrase, otrafrase);
+                                cs += MyExternalMDS.GetCosineSimilarityBetweenPhrases(
+                                    thisPhrase, otrafrase);
 
                         var cov = 0.0;
-                        foreach (var otrafrase in activePhrases)
+                        foreach (var otrafrase in selectedPhrases)
                             if (otrafrase > thisPhrase)
                                 cov += MyTDM.PhrasesList[thisPhrase].SimilarityToDocument +
                                         MyTDM.PhrasesList[otrafrase].SimilarityToDocument;
@@ -74,7 +123,9 @@ namespace BusinessRules.ExtractiveSummarizer.Metaheuristics
 
                         phrasesList.Add(new PositionValue(thisPhrase, f));
                     }
-                    phrasesList.Sort((x, y) => -1 * x.Value.CompareTo(y.Value));
+                    phrasesList.Sort((x, y) => -1 * 
+                                               x.Value.CompareTo(y.Value));
+                    phrasesList.AddRange(additionalPhrase);
                     break;
             }
             return phrasesList;

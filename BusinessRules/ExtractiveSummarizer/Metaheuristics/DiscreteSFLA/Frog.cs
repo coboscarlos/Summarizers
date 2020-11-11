@@ -1,8 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace BusinessRules.ExtractiveSummarizer.Metaheuristics.DiscreteSFLA
 {
-    public class Frog : BaseSolucion
+    public class Frog : BaseSolution
     {
         public readonly double Alfa = 0.4;
 
@@ -37,7 +38,7 @@ namespace BusinessRules.ExtractiveSummarizer.Metaheuristics.DiscreteSFLA
                 InActivate(pos);
             }
 
-            AddValidPhrases();
+            AddValidPhrases(new List<int>());
             CalculateFitness();
         }
 
@@ -49,7 +50,7 @@ namespace BusinessRules.ExtractiveSummarizer.Metaheuristics.DiscreteSFLA
             var pos = MyContainer.MyParameters.RandomGenerator.Next(SelectedPhrases.Count);
             pos = SelectedPhrases[pos];
             InActivate(pos);
-            AddValidPhrases();
+            AddValidPhrases(new List<int>());
             CalculateFitness();
         }
     }

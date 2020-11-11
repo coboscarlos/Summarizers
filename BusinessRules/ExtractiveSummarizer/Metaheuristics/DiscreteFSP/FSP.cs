@@ -9,8 +9,7 @@ namespace BusinessRules.ExtractiveSummarizer.Metaheuristics.DiscreteFSP
     {
         public FSPSolution Best;        
         public List<FSPSolution> CapturePoints;
-        public List<FSPSolution> Pi; //  Local memory of the best solution found in each neighborhood of the capture point
-
+        
         public override void Summarize(SummaryParameters mySummaryParameters, string newsDirectory, string cacheFileName)
         {
             MyParameters = (FSPParameters)mySummaryParameters;
@@ -35,43 +34,48 @@ namespace BusinessRules.ExtractiveSummarizer.Metaheuristics.DiscreteFSP
             SortLengths();
 
             CapturePoints = new List<FSPSolution>();
-            Pi = new List<FSPSolution>();
+            var pi = new List<FSPSolution>(); //  Local memory of the best solution found in each neighborhood of the capture point
+            var lemt = new List<TabuMemory>();
             Best = new FSPSolution(this);
 
             // Population initialization, fitness is calculated for each agent and local search is applied
-            while  (CapturePoints.Count < myParameters.N)
+            for  (var i= 0; i < myParameters.N; i++)
             {
                 var newCapturePoint = new FSPSolution(this);
                 newCapturePoint.RandomInitialization();
-                if (CapturePoints.Exists(x => x.Equals(newCapturePoint))) continue;
 
                 CapturePoints.Add(newCapturePoint);
-                Pi.Add(newCapturePoint);
+                pi.Add(new FSPSolution(newCapturePoint));
+
+                lemt.Add(new TabuMemory(myParameters.Tenure));
+                lemt[lemt.Count-1].Include(newCapturePoint.SelectedPhrases);
+
                 if (CurrentFFEs > MaximumNumberOfFitnessFunctionEvaluations)  // MaxFFEs exceeded?
                     break;
             }
 
             CapturePoints.Sort((x, y) => -1 * x.Fitness.CompareTo(y.Fitness));
-            Pi.Sort((x, y) => -1 * x.Fitness.CompareTo(y.Fitness));
+            pi.Sort((x, y) => -1 * x.Fitness.CompareTo(y.Fitness));
             Best = new FSPSolution(CapturePoints[0]);
             
-            var c = myParameters.C;
-            for (var actualGeneration = 0; actualGeneration < myParameters.T; actualGeneration++)
+            while (CurrentFFEs < MaximumNumberOfFitnessFunctionEvaluations)
             {
                 for (var i = 0; i < myParameters.N; i++)
                 {
                     // Each fisherman at his capture throws the net L times
-                    var auxL = 0;
-                    while ((auxL < myParameters.L))
+                    for (var auxL = 0; auxL < myParameters.L; auxL++)
                     {
-                        var mejorsolucionLocal = CapturePoints[i].ThrowFishingNet(c); // Throw the network, update PI and Best if it is the case
-                        if (mejorsolucionLocal.Fitness > Pi[i].Fitness)
-                            Pi[i] = new FSPSolution(mejorsolucionLocal);
-                        auxL++;
+                        // Throw the network, update PI and Best if it is the case
+                        var mejorsolucionLocal = 
+                            CapturePoints[i].GenerateNeighbor(lemt[i]);
+                        lemt[i].Include(mejorsolucionLocal.SelectedPhrases);
+
+                        if (mejorsolucionLocal.Fitness > pi[i].Fitness)
+                            pi[i] = new FSPSolution(mejorsolucionLocal);
                         if (CurrentFFEs >= MaximumNumberOfFitnessFunctionEvaluations) break;
                     }
-                    if (Pi[i].Fitness > CapturePoints[i].Fitness)
-                        CapturePoints[i] = new FSPSolution(Pi[i]);
+                    if (pi[i].Fitness > CapturePoints[i].Fitness)
+                        CapturePoints[i] = new FSPSolution(pi[i]);
 
                     if (CapturePoints[i].Fitness > Best.Fitness)
                         Best = new FSPSolution(CapturePoints[i]);
@@ -80,12 +84,14 @@ namespace BusinessRules.ExtractiveSummarizer.Metaheuristics.DiscreteFSP
                 }
 
                 CapturePoints.Sort((x, y) => -1 * x.Fitness.CompareTo(y.Fitness));
-                Pi.Sort((x, y) => -1 * x.Fitness.CompareTo(y.Fitness));
+                pi.Sort((x, y) => -1 * x.Fitness.CompareTo(y.Fitness));
 
                 if (CurrentFFEs >= MaximumNumberOfFitnessFunctionEvaluations) break;
             }
 
-            var phrasesList = SelectPhrasesFromFinalSummary(Best.SelectedPhrases); 
+            var mostRepeated = SelectToCompleteSummary(new List<BaseSolution>(CapturePoints), Best);
+            var phrasesList = SelectPhrasesFromFinalSummary(Best.SelectedPhrases, mostRepeated);
+
             return phrasesList;
         }
 
