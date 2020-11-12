@@ -55,8 +55,8 @@ namespace Interface
                                             myParameters.MyTDMParameters.TheDocumentRepresentation;
                 nombreArchivosCache = nombreArchivosCache.Replace(",", ".");
 
-                //Parallel.For(0, maxRepetitions, repetition =>
-                for (var repetition=0; repetition < maxRepetitions; repetition++)
+                Parallel.For(0, maxRepetitions, repetition =>
+                //for (var repetition=0; repetition < maxRepetitions; repetition++)
                 {
                     //if (laNoticia != "LA042190-0060")
                     //    continue;
@@ -107,8 +107,8 @@ namespace Interface
                         File.WriteAllText(directorioExperimento + @"\" + thisNews, contenidoResumenFinal);
                     }
                     Debug.Write(repetition + ", ");
-                } // Fin de for
-                //}); // Fin de Parallel.For
+                //} // Fin de for
+                }); // Fin de Parallel.For
                 Debug.WriteLine("");
                 Debug.WriteLine("THREAD :" + Thread.CurrentThread.ManagedThreadId + 
                                 " NEWS " + thisNews);
